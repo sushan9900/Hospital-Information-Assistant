@@ -50,6 +50,7 @@ from app.schemas.chatbot import (
     ChatMessage,
     ChatHistoryResponse
 )
+from app.services.qdrant_service import QdrantService
 
 
 # ==============================================================================
@@ -107,6 +108,9 @@ Guidelines:
 
 If asked about something outside your scope (like personal advice, non-medical topics), 
 politely redirect the conversation back to hospital-related topics.
+
+Relevant context from the hospital database (use this to help answer the user's query if relevant):
+{context}
 """
 
 
@@ -154,10 +158,10 @@ class AIService:
         if cls._chain_with_history is None:
 
             # Step 1: Build the prompt template
-            # The prompt has two parts:
-            #   a) System message: tells the AI its role and rules
+            # The prompt has three parts:
+            #   a) System message: tells the AI its role, rules, and database context
             #   b) MessagesPlaceholder: inserts the conversation history here
-            #      so the AI can see all previous messages
+            #   c) Human message: inserts current user message
             prompt = ChatPromptTemplate.from_messages([
                 ("system", HOSPITAL_SYSTEM_PROMPT),
                 MessagesPlaceholder(variable_name="history"),  # Chat history goes here
@@ -203,9 +207,10 @@ class AIService:
         Steps:
         1. Validate the message is not empty
         2. Get or create the ChatSession DB record for this session_id
-        3. Invoke the LangChain chain (loads history → sends to Groq → saves reply)
-        4. Update the ChatSession DB record with message count and preview
-        5. Return the AI response
+        3. Search Qdrant for relevant database context
+        4. Invoke the LangChain chain (loads history → sends to Groq with context → saves reply)
+        5. Update the ChatSession DB record with message count and preview
+        6. Return the AI response
 
         Args:
             db: Async database session.
@@ -235,17 +240,40 @@ class AIService:
             user_id=current_user.id
         )
 
+        # Step 3: Search Qdrant for hospital documents relevant to the message
+        context_str = "No relevant context found."
         try:
-            # Step 3: Invoke the LangChain chain with memory
+            results = QdrantService.search(
+                collection_name=settings.QDRANT_COLLECTION_NAME,
+                query_text=chat_request.message,
+                top_k=3,
+                score_threshold=0.3
+            )
+            if results:
+                context_parts = []
+                for i, result in enumerate(results, 1):
+                    payload = result.payload or {}
+                    context_parts.append(
+                        f"[Record {i}]\n"
+                        f"Type: {payload.get('type', 'Unknown').title()}\n"
+                        f"Content: {payload.get('content', 'No content available')}\n"
+                    )
+                context_str = "\n".join(context_parts)
+        except Exception:
+            # If Qdrant is not set up or search fails, fall back to default
+            pass
+
+        try:
+            # Step 4: Invoke the LangChain chain with memory
             # The chain automatically:
             #   - Loads conversation history for this session_id
-            #   - Builds the prompt with history + new message
+            #   - Builds the prompt with history + context + new message
             #   - Sends to Groq LLM
             #   - Saves the new message + AI reply to memory
             chain = AIService._get_chain()
 
             response = await chain.ainvoke(
-                {"input": chat_request.message},
+                {"input": chat_request.message, "context": context_str},
                 config={"configurable": {"session_id": chat_request.session_id}}
             )
 

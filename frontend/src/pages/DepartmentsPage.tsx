@@ -30,6 +30,29 @@ import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Toast, ToastType } from '@/components/Toast';
 
+const STANDARD_DEPARTMENTS = [
+  'Cardiology',
+  'Neurology',
+  'Pediatrics',
+  'Orthopedics',
+  'General Medicine',
+  'Dermatology',
+  'Gynecology & Obstetrics',
+  'Oncology',
+  'Ophthalmology',
+  'Psychiatry',
+  'Radiology',
+  'Emergency Medicine',
+  'Gastroenterology',
+  'Urology',
+  'Pulmonology',
+  'Nephrology',
+  'ENT (Otolaryngology)',
+  'Endocrinology',
+  'Anesthesiology',
+  'Pathology'
+];
+
 export const DepartmentsPage: React.FC = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === UserRole.ADMIN;
@@ -116,7 +139,7 @@ export const DepartmentsPage: React.FC = () => {
   // ADMIN: OPEN CREATE / EDIT MODALS
   // ----------------------------------------------------------------------------
   const openCreateModal = () => {
-    setName('');
+    setName(STANDARD_DEPARTMENTS[0]);
     setDescription('');
     setLocation('');
     setPhone('');
@@ -444,14 +467,18 @@ export const DepartmentsPage: React.FC = () => {
           {/* Department Name */}
           <div className="space-y-1">
             <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Department Name *</label>
-            <input
-              type="text"
+            <select
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Cardiology"
-              className="w-full p-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 outline-none hover:border-slate-300 focus:border-emerald-500 transition-all"
+              className="w-full p-2.5 bg-white rounded-xl border border-slate-200 text-sm text-slate-700 outline-none hover:border-slate-300 focus:border-emerald-500 transition-all"
               required
-            />
+            >
+              {STANDARD_DEPARTMENTS.map((dept) => (
+                <option key={dept} value={dept}>
+                  {dept}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Location */}
