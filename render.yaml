@@ -1,0 +1,58 @@
+# ==============================================================================
+# Hospital Information Assistance — Render Deployment Blueprint
+# ==============================================================================
+# WHY THIS FILE EXISTS:
+#   Render support "Blueprints" (Infrastructure as Code).
+#   This file allows you to deploy the backend to Render instantly from your
+#   GitHub repository.
+#
+# HOW IT DEPLOYS:
+#   - Deploys as a Docker Web Service (uses the Dockerfile in /backend).
+#   - Runs on the Free tier.
+#   - Exposes environment variable configs to fill in via Render's dashboard.
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # FASTAPI BACKEND SERVICE
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: hospital-info-backend
+    env: docker                # Tells Render to build and deploy using Dockerfile
+    plan: free                 # Free tier hosting
+    region: oregon             # Default deployment region
+    
+    # Points to the folder containing the backend Dockerfile
+    rootDir: backend
+    
+    # Environment variables to inject into the container
+    envVars:
+      - key: PORT
+        value: 10000           # Port Render listens on (overrides container default)
+      
+      - key: DEBUG
+        value: "false"         # Turn off debugging logs in production
+      
+      # Database connection string (referencing your Neon PostgreSQL cluster)
+      - key: DATABASE_URL
+        sync: false            # To be filled in manually on the Render dashboard
+      
+      # Security key for JWT sign verification
+      - key: SECRET_KEY
+        generateValue: true    # Render generates a secure random key automatically!
+      
+      # Groq API access token
+      - key: GROQ_API_KEY
+        sync: false
+      
+      # Qdrant Vector Cloud cluster
+      - key: QDRANT_URL
+        sync: false
+      
+      - key: QDRANT_API_KEY
+        sync: false
+      
+      # CORS: Add your Vercel frontend URL here to allow browser requests
+      # Example: ["https://hospital-info-assistant.vercel.app"]
+      - key: BACKEND_CORS_ORIGINS
+        value: '["*"]'         # Starts open, lock down to your Vercel URL post-deploy

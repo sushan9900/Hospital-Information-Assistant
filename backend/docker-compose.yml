@@ -1,0 +1,95 @@
+# ==============================================================================
+# Hospital Information Assistance — Docker Compose Configuration
+# ==============================================================================
+# WHY THIS FILE EXISTS:
+#   This file allows you to spin up the backend service in a single command:
+#   ```bash
+#   docker-compose up --build
+#   ```
+#   It maps ports, mounts local code for live-reloading during development,
+#   and sets up environment variables.
+#
+# DATABASE & VECTOR STORE OPTIONS:
+#   By default, this config connects to:
+#   - PostgreSQL hosted on Neon Cloud (via settings in .env)
+#   - Qdrant Vector DB hosted on Qdrant Cloud (via settings in .env)
+#
+#   Commented-out local service containers (PostgreSQL and Qdrant) are
+#   provided at the bottom of this file in case you want to run the entire
+#   stack locally in the future.
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # FASTAPI BACKEND API SERVICE
+  # ----------------------------------------------------------------------------
+  api:
+    # Build container from Dockerfile in current folder (backend)
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    # Name of the container when running
+    container_name: hospital_assistant_api
+    
+    # Restart policy: always try to keep the container running
+    restart: always
+    
+    # Map container port 8000 to host port 8000
+    # Allows you to access the API at http://localhost:8000
+    ports:
+      - "8000:8000"
+    
+    # Load environment variables from the local .env file
+    env_file:
+      - .env
+    
+    # Override standard run command to enable hot reloading for development.
+    # --reload tells Uvicorn to restart when files change in the /code directory.
+    # Note: On Render, Uvicorn will run using the Dockerfile's CMD (without reload).
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    
+    # Mount the local codebase into the container
+    # Changes made on your host machine will be immediately reflected inside
+    # the container (required for --reload to work).
+    volumes:
+      - .:/code
+
+# ==============================================================================
+# LOCAL DEVELOPMENT CONTAINER OVERRIDES (OPTIONAL)
+# If you want to run PostgreSQL or Qdrant locally instead of in the cloud,
+# uncomment the services below and update your `.env` connection strings:
+#
+# DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/hospital_db
+# QDRANT_URL=http://qdrant:6333
+# QDRANT_API_KEY=""
+# ==============================================================================
+
+#   db:
+#     image: postgres:15-alpine
+#     container_name: local_postgres
+#     restart: always
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: postgres
+#       POSTGRES_DB: hospital_db
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+
+#   qdrant:
+#     image: qdrant/qdrant:latest
+#     container_name: local_qdrant
+#     restart: always
+#     ports:
+#       - "6333:6333"
+#       - "6334:6334"
+#     volumes:
+#       - qdrant_data:/qdrant/storage
+
+# volumes:
+#   postgres_data:
+#   qdrant_data:

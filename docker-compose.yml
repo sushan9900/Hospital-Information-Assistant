@@ -1,0 +1,55 @@
+# ==============================================================================
+# Hospital Information Assistance — Root Docker Compose
+# ==============================================================================
+# WHY THIS FILE EXISTS:
+#   This compose file allows you to spin up the ENTIRE full-stack application
+#   (FastAPI backend + React frontend) in a single command from the project root:
+#   ```bash
+#   docker-compose up --build
+#   ```
+#
+# NETWORK & PORTS MAPPING:
+#   - Backend API: http://localhost:8000  (FastAPI Swagger docs at /docs)
+#   - Frontend UI: http://localhost       (Served via Nginx container on port 80)
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # FASTAPI BACKEND SERVICE
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hospital_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    # We mount the local app folder for dev hot-reloading
+    volumes:
+      - ./backend:/code
+    # Development override to run reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ----------------------------------------------------------------------------
+  # REACT FRONTEND SERVICE (SERVED VIA NGINX)
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: hospital_frontend
+    restart: always
+    # Map container Nginx port 80 to host HTTP port 80
+    ports:
+      - "80:80"
+    # Ensure backend starts up first
+    depends_on:
+      - backend
+    # Loads environment configs
+    env_file:
+      - ./frontend/.env

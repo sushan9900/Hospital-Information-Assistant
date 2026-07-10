@@ -1,0 +1,34 @@
+# Version Control
+.git
+.gitignore
+
+# Package manager files and folders
+node_modules/
+npm-debug.log*
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+
+# Local configuration secrets
+.env
+.env.local
+.env.production
+.env.development
+.env.*
+
+# Editor files and configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker files (not needed inside container build environment)
+Dockerfile
+nginx.conf
+.dockerignore
+
+# OS specific files
+.DS_Store
+Thumbs.db
