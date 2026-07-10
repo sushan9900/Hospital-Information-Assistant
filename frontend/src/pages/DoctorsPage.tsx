@@ -68,7 +68,6 @@ export const DoctorsPage: React.FC = () => {
 
   // Input states (Admin Create/Edit form)
   const [fullName, setFullName] = useState('');
-  const [specialization, setSpecialization] = useState('');
   const [departmentId, setDepartmentId] = useState<number>(0);
   const [qualification, setQualification] = useState('');
   const [experienceYears, setExperienceYears] = useState<number>(0);
@@ -171,7 +170,6 @@ export const DoctorsPage: React.FC = () => {
   // ----------------------------------------------------------------------------
   const openCreateModal = () => {
     setFullName('');
-    setSpecialization('');
     if (departments.length > 0) setDepartmentId(departments[0].id);
     setQualification('');
     setExperienceYears(0);
@@ -187,7 +185,6 @@ export const DoctorsPage: React.FC = () => {
   const openEditModal = (doctor: Doctor) => {
     setEditingDoctor(doctor);
     setFullName(doctor.full_name);
-    setSpecialization(doctor.specialization);
     setDepartmentId(doctor.department_id);
     setQualification(doctor.qualification || '');
     setExperienceYears(doctor.experience_years || 0);
@@ -206,9 +203,12 @@ export const DoctorsPage: React.FC = () => {
     e.preventDefault();
     setAdminFormError(null);
 
+    const selectedDept = departments.find((d) => d.id === departmentId);
+    const deptName = selectedDept ? selectedDept.name : '';
+
     const docInput: DoctorInput = {
       full_name: fullName,
-      specialization,
+      specialization: deptName,
       department_id: departmentId,
       qualification: qualification || null,
       experience_years: experienceYears || null,
@@ -580,21 +580,6 @@ export const DoctorsPage: React.FC = () => {
               />
             </div>
 
-            {/* Specialization */}
-            <div className="space-y-1">
-              <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Specialization *</label>
-              <input
-                type="text"
-                value={specialization}
-                onChange={(e) => setSpecialization(e.target.value)}
-                placeholder="Cardiologist"
-                className="w-full p-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 outline-none hover:border-slate-300 focus:border-emerald-500 transition-all"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Department Selection */}
             <div className="space-y-1">
               <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Hospital Department *</label>
@@ -611,7 +596,9 @@ export const DoctorsPage: React.FC = () => {
                 ))}
               </select>
             </div>
+          </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Consultation Fee */}
             <div className="space-y-1">
               <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Consultation Fee (INR)</label>
@@ -620,20 +607,6 @@ export const DoctorsPage: React.FC = () => {
                 value={consultationFee}
                 onChange={(e) => setConsultationFee(e.target.value)}
                 placeholder="500"
-                className="w-full p-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 outline-none hover:border-slate-300 focus:border-emerald-500 transition-all"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Qualification */}
-            <div className="space-y-1">
-              <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Academic Qualifications</label>
-              <input
-                type="text"
-                value={qualification}
-                onChange={(e) => setQualification(e.target.value)}
-                placeholder="MBBS, MD Cardiology"
                 className="w-full p-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 outline-none hover:border-slate-300 focus:border-emerald-500 transition-all"
               />
             </div>
@@ -650,6 +623,18 @@ export const DoctorsPage: React.FC = () => {
                 className="w-full p-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 outline-none hover:border-slate-300 focus:border-emerald-500 transition-all"
               />
             </div>
+          </div>
+
+          {/* Qualification */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Academic Qualifications</label>
+            <input
+              type="text"
+              value={qualification}
+              onChange={(e) => setQualification(e.target.value)}
+              placeholder="MBBS, MD Cardiology"
+              className="w-full p-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 outline-none hover:border-slate-300 focus:border-emerald-500 transition-all"
+            />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
