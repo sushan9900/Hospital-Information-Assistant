@@ -69,8 +69,6 @@ export const ProfilePage: React.FC = () => {
     setIsProfileLoading(true);
     try {
       const updatedUser = await userService.updateProfile(fullName, email);
-      
-      // Update global React state
       updateUser(updatedUser);
       setProfileSuccess('Profile information updated successfully.');
     } catch (error: any) {
@@ -89,7 +87,6 @@ export const ProfilePage: React.FC = () => {
     setPasswordSuccess(null);
     setPasswordError(null);
 
-    // Front-end validations
     if (!currentPassword || !newPassword || !confirmNewPassword) {
       setPasswordError('Please fill in all password fields.');
       return;
@@ -109,8 +106,6 @@ export const ProfilePage: React.FC = () => {
     try {
       await userService.changePassword(currentPassword, newPassword, confirmNewPassword);
       setPasswordSuccess('Password changed successfully.');
-      
-      // Clear password input fields on success
       setCurrentPassword('');
       setNewPassword('');
       setConfirmNewPassword('');
@@ -123,50 +118,50 @@ export const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto animate-in fade-in duration-300">
+    <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in duration-300">
       
       {/* PAGE HEADER */}
       <div>
-        <h1 className="text-2xl font-black text-slate-800 tracking-tight">Account Settings</h1>
-        <p className="text-sm font-semibold text-slate-400 mt-1">
-          Manage your personal details, email configurations, and security passwords.
+        <h1 className="font-serif text-2xl text-clinic-forest-500 dark:text-slate-100 font-semibold tracking-tight">Account Settings</h1>
+        <p className="text-[10px] font-sans font-bold text-clinic-sage-500 uppercase tracking-widest mt-1">
+          Manage your personal details, email configurations, and security credentials.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* LEFT COLUMN: AVATAR & OVERVIEW CARD */}
         <div className="md:col-span-1 space-y-6">
-          <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm flex flex-col items-center text-center">
+          <div className="bg-white dark:bg-slate-900 border border-clinic-sage-200/40 dark:border-slate-800 rounded-xl p-6 shadow-premium flex flex-col items-center text-center">
             
             {/* Avatar Circle */}
-            <div className="h-20 w-20 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center font-black text-2xl shadow-inner">
+            <div className="h-20 w-20 rounded-xl bg-clinic-sage-50 dark:bg-clinic-forest-500/10 text-clinic-forest-500 border border-clinic-sage-200/40 dark:border-slate-800 flex items-center justify-center font-serif font-bold text-2xl shadow-inner animate-in zoom-in-95 duration-200">
               {getInitials(fullName)}
             </div>
 
             {/* Display Name / Email */}
             <div className="mt-4 space-y-1">
-              <h3 className="font-bold text-slate-800 text-base">{fullName}</h3>
-              <p className="text-xs text-slate-400 font-semibold">{email}</p>
+              <h3 className="font-serif text-base font-semibold text-clinic-text dark:text-slate-100">{fullName}</h3>
+              <p className="text-xs text-clinic-text/65 dark:text-slate-500 font-semibold">{email}</p>
             </div>
 
             {/* Meta Data tags */}
-            <div className="w-full border-t border-slate-100 mt-6 pt-6 space-y-3.5 text-left text-xs">
+            <div className="w-full border-t border-clinic-sage-200/20 dark:border-slate-850 mt-6 pt-6 space-y-3.5 text-left text-xs">
               
               {/* Role badge */}
               <div className="flex justify-between items-center">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Access Level</span>
-                <span className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">
-                  <Shield size={12} />
-                  <span className="capitalize">{user?.role}</span>
+                <span className="text-[9px] font-sans font-bold text-clinic-text/55 dark:text-slate-500 uppercase tracking-widest">Access Level</span>
+                <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-clinic-sage-50 dark:bg-clinic-forest-500/10 text-clinic-forest-700 dark:text-clinic-400 font-sans font-bold border border-clinic-sage-200/40 dark:border-slate-800">
+                  <Shield size={11} />
+                  <span className="capitalize text-[9px] tracking-wider font-extrabold">{user?.role}</span>
                 </span>
               </div>
 
               {/* Created Date */}
               <div className="flex justify-between items-center">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Member Since</span>
-                <span className="text-slate-600 font-bold flex items-center">
-                  <Calendar size={13} className="mr-1 text-slate-400" />
+                <span className="text-[9px] font-sans font-bold text-clinic-text/55 dark:text-slate-500 uppercase tracking-widest">Member Since</span>
+                <span className="text-clinic-text/80 dark:text-slate-300 font-bold flex items-center font-sans text-xs">
+                  <Calendar size={13} className="mr-1 text-clinic-sage-500" />
                   {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
                 </span>
               </div>
@@ -180,39 +175,39 @@ export const ProfilePage: React.FC = () => {
         <div className="md:col-span-2 space-y-6">
           
           {/* 1. PERSONAL INFORMATION FORM */}
-          <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-            <div className="border-b border-slate-100 px-6 py-4">
-              <h3 className="font-bold text-slate-800 text-sm">Personal Information</h3>
+          <div className="bg-white dark:bg-slate-900 border border-clinic-sage-200/40 dark:border-slate-800 rounded-xl shadow-premium overflow-hidden">
+            <div className="border-b border-clinic-sage-200/40 dark:border-slate-800 px-6 py-4 bg-white/40 dark:bg-slate-900/40">
+              <h3 className="font-serif text-sm text-clinic-forest-500 dark:text-slate-155 font-semibold">Personal Information</h3>
             </div>
             
             <form onSubmit={handleUpdateProfile} className="p-6 space-y-4">
               {/* Form Status Messages */}
               {profileError && (
-                <div className="flex items-start space-x-2.5 p-3.5 rounded-xl border border-red-100 bg-red-50 text-red-800 text-xs font-semibold">
-                  <AlertCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
+                <div className="flex items-start space-x-2.5 p-3.5 rounded-xl border border-clinic-terracotta-100 dark:border-clinic-terracotta-500/20 bg-clinic-terracotta-50/50 dark:bg-clinic-terracotta-500/10 text-clinic-terracotta-600 dark:text-clinic-terracotta-400 text-xs font-semibold animate-in fade-in duration-200">
+                  <AlertCircle size={16} className="text-clinic-terracotta-500 flex-shrink-0 mt-0.5" />
                   <span className="leading-relaxed">{profileError}</span>
                 </div>
               )}
               {profileSuccess && (
-                <div className="flex items-start space-x-2.5 p-3.5 rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-800 text-xs font-semibold">
-                  <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                <div className="flex items-start space-x-2.5 p-3.5 rounded-xl border border-clinic-sage-200/60 dark:border-slate-850 bg-clinic-bg/40 dark:bg-slate-950/40 text-clinic-forest-500 dark:text-slate-300 text-xs font-semibold animate-in fade-in duration-200">
+                  <CheckCircle2 size={16} className="text-clinic-sage-550 flex-shrink-0 mt-0.5" />
                   <span className="leading-relaxed">{profileSuccess}</span>
                 </div>
               )}
 
               {/* Full Name input */}
               <div className="space-y-1">
-                <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                <label className="text-[9px] font-sans font-bold text-clinic-text/60 dark:text-slate-500 uppercase tracking-widest">
                   Full Name
                 </label>
                 <div className="relative flex items-center">
-                  <UserIcon size={16} className="absolute left-3.5 text-slate-400" />
+                  <UserIcon size={15} className="absolute left-3.5 text-clinic-sage-500 pointer-events-none" />
                   <input
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     disabled={isProfileLoading}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 outline-none hover:border-slate-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 shadow-sm transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-clinic-sage-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm text-clinic-text dark:text-slate-205 outline-none hover:border-clinic-sage-500 focus:border-clinic-forest-500 dark:focus:border-clinic-forest-500 focus:ring-1 focus:ring-clinic-forest-500/25 transition-all font-semibold"
                     required
                   />
                 </div>
@@ -220,17 +215,17 @@ export const ProfilePage: React.FC = () => {
 
               {/* Email Input */}
               <div className="space-y-1">
-                <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                <label className="text-[9px] font-sans font-bold text-clinic-text/60 dark:text-slate-500 uppercase tracking-widest">
                   Email Address
                 </label>
                 <div className="relative flex items-center">
-                  <Mail size={16} className="absolute left-3.5 text-slate-400" />
+                  <Mail size={15} className="absolute left-3.5 text-clinic-sage-500 pointer-events-none" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isProfileLoading}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 outline-none hover:border-slate-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 shadow-sm transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-clinic-sage-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm text-clinic-text dark:text-slate-205 outline-none hover:border-clinic-sage-500 focus:border-clinic-forest-500 dark:focus:border-clinic-forest-500 focus:ring-1 focus:ring-clinic-forest-500/25 transition-all font-semibold"
                     required
                   />
                 </div>
@@ -241,7 +236,7 @@ export const ProfilePage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isProfileLoading}
-                  className="flex items-center justify-center space-x-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-md shadow-emerald-100 transition-colors disabled:opacity-50"
+                  className="flex items-center justify-center space-x-2 bg-clinic-forest-500 hover:bg-clinic-forest-600 text-white font-sans font-bold py-2.5 px-6 rounded-xl text-[10px] uppercase tracking-wider shadow-premium hover:shadow-premium-hover transition-colors disabled:opacity-50"
                 >
                   {isProfileLoading && <Loader2 size={14} className="animate-spin" />}
                   <span>Save Changes</span>
@@ -252,40 +247,40 @@ export const ProfilePage: React.FC = () => {
           </div>
 
           {/* 2. PASSWORD UPDATE FORM */}
-          <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
-            <div className="border-b border-slate-100 px-6 py-4">
-              <h3 className="font-bold text-slate-800 text-sm">Security & Password</h3>
+          <div className="bg-white dark:bg-slate-900 border border-clinic-sage-200/40 dark:border-slate-800 rounded-xl shadow-premium overflow-hidden">
+            <div className="border-b border-clinic-sage-200/40 dark:border-slate-800 px-6 py-4 bg-white/40 dark:bg-slate-900/40">
+              <h3 className="font-serif text-sm text-clinic-forest-500 dark:text-slate-155 font-semibold">Security & Password</h3>
             </div>
 
             <form onSubmit={handleUpdatePassword} className="p-6 space-y-4">
               {/* Form Status Messages */}
               {passwordError && (
-                <div className="flex items-start space-x-2.5 p-3.5 rounded-xl border border-red-100 bg-red-50 text-red-800 text-xs font-semibold">
-                  <AlertCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
+                <div className="flex items-start space-x-2.5 p-3.5 rounded-xl border border-clinic-terracotta-100 dark:border-clinic-terracotta-500/20 bg-clinic-terracotta-50/50 dark:bg-clinic-terracotta-500/10 text-clinic-terracotta-600 dark:text-clinic-terracotta-400 text-xs font-semibold animate-in fade-in duration-200">
+                  <AlertCircle size={16} className="text-clinic-terracotta-500 flex-shrink-0 mt-0.5" />
                   <span className="leading-relaxed">{passwordError}</span>
                 </div>
               )}
               {passwordSuccess && (
-                <div className="flex items-start space-x-2.5 p-3.5 rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-800 text-xs font-semibold">
-                  <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                <div className="flex items-start space-x-2.5 p-3.5 rounded-xl border border-clinic-sage-200/60 dark:border-slate-855 bg-clinic-bg/40 dark:bg-slate-950/40 text-clinic-forest-500 dark:text-slate-300 text-xs font-semibold animate-in fade-in duration-200">
+                  <CheckCircle2 size={16} className="text-clinic-sage-550 flex-shrink-0 mt-0.5" />
                   <span className="leading-relaxed">{passwordSuccess}</span>
                 </div>
               )}
 
               {/* Current Password input */}
               <div className="space-y-1">
-                <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                <label className="text-[9px] font-sans font-bold text-clinic-text/60 dark:text-slate-500 uppercase tracking-widest">
                   Current Password
                 </label>
                 <div className="relative flex items-center">
-                  <Lock size={16} className="absolute left-3.5 text-slate-400" />
+                  <Lock size={15} className="absolute left-3.5 text-clinic-sage-500 pointer-events-none" />
                   <input
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     disabled={isPasswordLoading}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 outline-none hover:border-slate-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 shadow-sm transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-clinic-sage-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm text-clinic-text dark:text-slate-205 outline-none hover:border-clinic-sage-500 focus:border-clinic-forest-500 dark:focus:border-clinic-forest-500 focus:ring-1 focus:ring-clinic-forest-500/25 transition-all font-semibold"
                     required
                   />
                 </div>
@@ -293,18 +288,18 @@ export const ProfilePage: React.FC = () => {
 
               {/* New Password input */}
               <div className="space-y-1">
-                <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                <label className="text-[9px] font-sans font-bold text-clinic-text/60 dark:text-slate-500 uppercase tracking-widest">
                   New Password
                 </label>
                 <div className="relative flex items-center">
-                  <Lock size={16} className="absolute left-3.5 text-slate-400" />
+                  <Lock size={15} className="absolute left-3.5 text-clinic-sage-500 pointer-events-none" />
                   <input
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     disabled={isPasswordLoading}
                     placeholder="At least 8 characters"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 outline-none hover:border-slate-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 shadow-sm transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-clinic-sage-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm text-clinic-text dark:text-slate-205 outline-none hover:border-clinic-sage-500 focus:border-clinic-forest-500 dark:focus:border-clinic-forest-500 focus:ring-1 focus:ring-clinic-forest-500/25 transition-all font-semibold"
                     required
                   />
                 </div>
@@ -312,18 +307,18 @@ export const ProfilePage: React.FC = () => {
 
               {/* Confirm New Password input */}
               <div className="space-y-1">
-                <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                <label className="text-[9px] font-sans font-bold text-clinic-text/60 dark:text-slate-500 uppercase tracking-widest">
                   Confirm New Password
                 </label>
                 <div className="relative flex items-center">
-                  <Lock size={16} className="absolute left-3.5 text-slate-400" />
+                  <Lock size={15} className="absolute left-3.5 text-clinic-sage-500 pointer-events-none" />
                   <input
                     type="password"
                     value={confirmNewPassword}
                     onChange={(e) => setConfirmNewPassword(e.target.value)}
                     disabled={isPasswordLoading}
                     placeholder="Re-enter new password"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 outline-none hover:border-slate-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 shadow-sm transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-clinic-sage-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm text-clinic-text dark:text-slate-205 outline-none hover:border-clinic-sage-500 focus:border-clinic-forest-500 dark:focus:border-clinic-forest-500 focus:ring-1 focus:ring-clinic-forest-500/25 transition-all font-semibold"
                     required
                   />
                 </div>
@@ -334,7 +329,7 @@ export const ProfilePage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isPasswordLoading}
-                  className="flex items-center justify-center space-x-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-md shadow-emerald-100 transition-colors disabled:opacity-50"
+                  className="flex items-center justify-center space-x-2 bg-clinic-forest-500 hover:bg-clinic-forest-600 text-white font-sans font-bold py-2.5 px-6 rounded-xl text-[10px] uppercase tracking-wider shadow-premium hover:shadow-premium-hover transition-colors disabled:opacity-50"
                 >
                   {isPasswordLoading && <Loader2 size={14} className="animate-spin" />}
                   <span>Change Password</span>

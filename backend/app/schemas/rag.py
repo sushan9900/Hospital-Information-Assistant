@@ -24,7 +24,7 @@
 # ==============================================================================
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -239,7 +239,7 @@ class RAGSearchResponse(BaseModel):
     success: bool = Field(description="Whether the search was successful")
     query: str = Field(description="The original search query")
     total_results: int = Field(description="Number of results returned")
-    results: list[SearchResultItem] = Field(
+    results: List[SearchResultItem] = Field(
         description="List of search results ordered by similarity score"
     )
 
@@ -337,7 +337,7 @@ class RAGAskResponse(BaseModel):
 
     # The context retrieved from Qdrant used to generate the answer
     # Showing sources builds user trust in the AI response
-    sources: list[SearchResultItem] = Field(
+    sources: List[SearchResultItem] = Field(
         default=[],
         description="Source records from Qdrant used to generate the answer"
     )

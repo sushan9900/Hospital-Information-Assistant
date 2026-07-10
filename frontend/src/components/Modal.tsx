@@ -11,6 +11,7 @@
 //   - Escape key listener to close modal
 //   - Responsive widths ('sm', 'md', 'lg', 'xl')
 //   - Backdrop fading and modal slide-up animations
+//   - Full Dark Mode support out-of-the-box
 // ==============================================================================
 
 import React, { useEffect, useRef } from 'react';
@@ -78,28 +79,28 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <div
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200"
     >
       <div
         ref={modalRef}
-        className={`w-full ${sizeClasses[size]} rounded-2xl bg-white shadow-2xl border border-slate-100 flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-300`}
+        className={`w-full ${sizeClasses[size]} rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-300`}
       >
         {/* MODAL HEADER */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-          <h3 className="text-lg font-bold text-slate-800 tracking-tight truncate">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-6 py-4">
+          <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight truncate">
             {title || 'Dialog'}
           </h3>
           <button
             onClick={onClose}
-            className="rounded-xl p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all duration-200 focus:outline-none"
+            className="rounded-xl p-1.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200 focus:outline-none"
             title="Close"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
         {/* MODAL CONTENT BODY */}
-        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar text-slate-600 text-sm leading-relaxed">
+        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
           {children}
         </div>
       </div>

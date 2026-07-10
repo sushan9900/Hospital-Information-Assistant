@@ -27,7 +27,7 @@
 
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -63,7 +63,7 @@ from app.services.qdrant_service import QdrantService
 # NOTE: This is an in-memory store — histories are lost when the server restarts.
 #       For production, replace with a Redis or database-backed store.
 # ==============================================================================
-_session_store: dict[str, ChatMessageHistory] = {}
+_session_store: Dict[str, ChatMessageHistory] = {}
 
 
 def get_session_history(session_id: str) -> ChatMessageHistory:

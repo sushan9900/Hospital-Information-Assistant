@@ -16,7 +16,7 @@
 # ==============================================================================
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -199,7 +199,7 @@ class DepartmentListResponse(BaseModel):
     """
 
     total: int = Field(description="Total number of departments in the database")
-    departments: list[DepartmentResponse] = Field(
+    departments: List[DepartmentResponse] = Field(
         description="List of department objects"
     )
 
@@ -235,7 +235,7 @@ class DepartmentDetailResponse(DepartmentResponse):
     """
 
     # List of doctors in this department
-    doctors: list[DoctorInDepartment] = Field(
+    doctors: List[DoctorInDepartment] = Field(
         default=[],
         description="List of doctors in this department"
     )

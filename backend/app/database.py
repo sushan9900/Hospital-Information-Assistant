@@ -50,6 +50,7 @@ engine = create_async_engine(
     # Pass driver-specific configurations inside connect_args
     connect_args={
         # Disable prepared statement cache to support Supabase connection pooler (pgBouncer)
+        "prepared_statement_cache_size": 0,
         "statement_cache_size": 0
     }
 )

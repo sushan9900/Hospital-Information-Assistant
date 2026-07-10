@@ -19,7 +19,7 @@
 # ==============================================================================
 
 from pydantic import BaseModel, EmailStr, Field, model_validator
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from app.models.user import UserRole
 
@@ -235,6 +235,6 @@ class UserListResponse(BaseModel):
     """
 
     total: int = Field(description="Total number of users in the database")
-    users: list[UserResponse] = Field(description="List of user objects")
+    users: List[UserResponse] = Field(description="List of user objects")
 
     model_config = {"from_attributes": True}

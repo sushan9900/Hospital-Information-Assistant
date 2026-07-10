@@ -7,15 +7,14 @@
      for AI Chat sidebars, input element overrides, and animations).
    ============================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply antialiased text-slate-800 bg-slate-50 font-sans;
+    /* Concierge Clinic design: warm ivory background, warm-black gray text, Inter sans body */
+    @apply antialiased text-clinic-text bg-clinic-bg dark:bg-slate-950 dark:text-slate-200 font-sans;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
@@ -35,21 +34,16 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1; /* slate-300 */
+  background: #cad9ce; /* clinic-sage-200 */
   border-radius: 9999px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8; /* slate-400 */
+  background: #84a98c; /* clinic-sage-500 */
 }
 
 /* CSS transition overrides for input field focus boundaries */
 input, select, textarea {
   transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Custom shadow utilities for premium card hovering */
-.shadow-glass {
-  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.04);
 }

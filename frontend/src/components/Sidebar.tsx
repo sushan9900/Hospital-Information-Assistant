@@ -6,11 +6,11 @@
 //   history) in a sidebar panel. It is primarily used on the AI Chatbot page
 //   to select old chats, start new conversations, and clear history logs.
 //
-// DESIGN & AESTHETICS:
-//   - Premium panel layout (`bg-slate-50/50`, `border-r`)
-//   - Interactive hover states and select states for active threads
-//   - Action buttons (Plus icon for new chat, Trash icon for clearing history)
-//   - Handles pagination internally or shows a scrollable thread list
+// DESIGN & AESTHETICS (CONCIERGE CLINIC):
+//   - Warm ivory/paper base matching layout details
+//   - Deep forest green buttons and active select states
+//   - Muted sage green icons, dividers, and list borders
+//   - Accessible, high-contrast, clean typography and spacing
 // ==============================================================================
 
 import React, { useEffect, useState } from 'react';
@@ -46,7 +46,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const fetchSessions = async () => {
     setIsLoading(true);
     try {
-      // Fetch the first 20 recent sessions
       const response = await chatService.listSessions(0, 20);
       setSessions(response.sessions);
     } catch (error) {
@@ -112,46 +111,46 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full w-80 bg-slate-900 border-r border-slate-800 text-slate-300">
+    <div className="flex flex-col h-full w-80 bg-clinic-bg dark:bg-slate-900 border-r border-clinic-sage-200/50 dark:border-slate-800 text-clinic-text dark:text-slate-350 transition-all duration-300">
       
       {/* SIDEBAR HEADER / PLUS BTN */}
-      <div className="p-4 border-b border-slate-800">
+      <div className="p-4 border-b border-clinic-sage-200/50 dark:border-slate-800 bg-white/40 dark:bg-slate-900/40">
         <button
           onClick={handleNewSession}
           disabled={isCreating}
-          className="flex w-full items-center justify-center space-x-2 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-emerald-950/20 hover:shadow-lg transition-all duration-200"
+          className="flex w-full items-center justify-center space-x-2 bg-clinic-forest-500 hover:bg-clinic-forest-600 active:bg-clinic-forest-700 text-white text-[10px] font-sans font-bold uppercase tracking-wider py-3.5 px-4 rounded-xl shadow-premium hover:shadow-premium-hover transition-all duration-200"
         >
           {isCreating ? (
-            <Loader2 size={18} className="animate-spin" />
+            <Loader2 size={14} className="animate-spin" />
           ) : (
-            <Plus size={18} />
+            <Plus size={14} />
           )}
-          <span>New Chat</span>
+          <span>New Consultation</span>
         </button>
       </div>
 
       {/* SESSION LIST */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1">
-        <div className="flex justify-between items-center px-2 py-1 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-          <span>Recent Conversations</span>
+        <div className="flex justify-between items-center px-2.5 py-1 mb-2.5 text-[9px] font-sans font-bold text-clinic-sage-500 uppercase tracking-widest">
+          <span>Previous Consultations</span>
           <button 
             onClick={fetchSessions} 
-            className="hover:text-slate-300 transition-colors" 
+            className="hover:text-clinic-forest-500 dark:hover:text-white transition-colors" 
             title="Refresh history"
             disabled={isLoading}
           >
-            <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
+            <RefreshCw size={11} className={isLoading ? 'animate-spin' : ''} />
           </button>
         </div>
 
         {isLoading && sessions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 space-y-2 text-slate-500">
-            <Loader2 size={24} className="animate-spin text-emerald-500" />
-            <span className="text-xs">Loading conversations...</span>
+          <div className="flex flex-col items-center justify-center py-12 space-y-3 text-clinic-sage-500">
+            <Loader2 size={18} className="animate-spin text-clinic-forest-500" />
+            <span className="text-[10px] font-sans font-bold uppercase tracking-wider">Loading history...</span>
           </div>
         ) : sessions.length === 0 ? (
-          <div className="text-center py-12 px-4 border border-dashed border-slate-800 rounded-xl text-slate-500 text-xs">
-            No previous conversations. Click "New Chat" to begin.
+          <div className="text-center py-16 px-4 border border-dashed border-clinic-sage-200 dark:border-slate-800 rounded-xl text-clinic-sage-500 dark:text-slate-500 text-xs font-semibold leading-relaxed">
+            No previous threads.<br />Create a "New Consultation" to begin.
           </div>
         ) : (
           sessions.map((session) => {
@@ -160,26 +159,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div
                 key={session.session_id}
                 onClick={() => onSelectSession(session.session_id)}
-                className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
+                className={`group flex items-center justify-between p-3.5 rounded-xl cursor-pointer transition-all duration-200 border ${
                   isSelected
-                    ? 'bg-slate-800 text-white shadow-sm border border-slate-700'
-                    : 'hover:bg-slate-800/40 text-slate-400 hover:text-slate-200 border border-transparent'
+                    ? 'bg-white dark:bg-slate-850 text-clinic-forest-500 dark:text-white shadow-premium border-clinic-sage-200/80 dark:border-slate-800 font-bold'
+                    : 'hover:bg-clinic-sage-50/50 dark:hover:bg-slate-800/40 text-clinic-text/80 dark:text-slate-400 hover:text-clinic-forest-500 dark:hover:text-white border-transparent'
                 }`}
               >
                 {/* Info block */}
                 <div className="flex items-start space-x-2.5 min-w-0 flex-1">
                   <MessageSquare
-                    size={16}
+                    size={14}
                     className={`mt-0.5 flex-shrink-0 ${
-                      isSelected ? 'text-emerald-400' : 'text-slate-500'
+                      isSelected ? 'text-clinic-forest-500' : 'text-clinic-sage-500'
                     }`}
                   />
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-sm font-semibold truncate leading-tight">
+                    <span className="text-xs truncate leading-snug">
                       {session.title || 'New Conversation'}
                     </span>
                     {session.last_message && (
-                      <span className="text-[11px] text-slate-500 truncate mt-1 leading-none group-hover:text-slate-400">
+                      <span className="text-[10px] text-clinic-sage-500 dark:text-slate-500 truncate mt-1 leading-none group-hover:text-clinic-sage-600">
                         {session.last_message}
                       </span>
                     )}
@@ -189,10 +188,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* Clear action button (visible on hover) */}
                 <button
                   onClick={(e) => handleClearHistory(e, session.session_id)}
-                  className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-slate-700/50 transition-all duration-200 ml-2"
-                  title="Clear history logs"
+                  className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-clinic-sage-500 hover:text-clinic-terracotta-500 hover:bg-clinic-sage-100/50 dark:hover:bg-slate-700/50 transition-all duration-200 ml-2"
+                  title="Clear conversation log"
                 >
-                  <Trash2 size={14} />
+                  <Trash2 size={12} />
                 </button>
               </div>
             );
@@ -201,9 +200,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* FOOTER */}
-      <div className="p-4 border-t border-slate-800 text-center text-xs text-slate-600 font-medium">
-        AI Chatbot System v1.0
+      <div className="p-4 border-t border-clinic-sage-200/50 dark:border-slate-800 text-center text-[9px] font-sans font-bold uppercase tracking-widest text-clinic-sage-500">
+        AI CONSULTANT SYSTEM v1.0
       </div>
     </div>
   );
 };
+export default Sidebar;

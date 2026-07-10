@@ -22,7 +22,7 @@
 # ==============================================================================
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -234,7 +234,7 @@ class SessionListResponse(BaseModel):
     """
 
     total: int = Field(description="Total number of sessions for this user")
-    sessions: list[SessionResponse] = Field(description="List of chat sessions")
+    sessions: List[SessionResponse] = Field(description="List of chat sessions")
 
     model_config = {"from_attributes": True}
 
@@ -277,7 +277,7 @@ class ChatHistoryResponse(BaseModel):
 
     session_id: str = Field(description="The session ID")
     title: Optional[str] = Field(description="Session title")
-    messages: list[ChatMessage] = Field(
+    messages: List[ChatMessage] = Field(
         default=[],
         description="List of all messages in the session (in order)"
     )

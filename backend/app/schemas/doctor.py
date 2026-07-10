@@ -15,7 +15,7 @@
 # ==============================================================================
 
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -270,6 +270,6 @@ class DoctorListResponse(BaseModel):
     """
 
     total: int = Field(description="Total number of doctors in the database")
-    doctors: list[DoctorResponse] = Field(description="List of doctor objects")
+    doctors: List[DoctorResponse] = Field(description="List of doctor objects")
 
     model_config = {"from_attributes": True}

@@ -23,6 +23,7 @@
 # ==============================================================================
 
 import time
+from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from langchain_groq import ChatGroq
@@ -117,7 +118,7 @@ class RAGService:
     # OUTPUT: list of SearchResultItem objects
     # --------------------------------------------------------------------------
     @staticmethod
-    def _build_search_result_items(results: list) -> list[SearchResultItem]:
+    def _build_search_result_items(results: list) -> List[SearchResultItem]:
         """
         Converts Qdrant ScoredPoint objects into SearchResultItem Pydantic models.
 

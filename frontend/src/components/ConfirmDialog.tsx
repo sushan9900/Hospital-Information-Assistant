@@ -5,10 +5,11 @@
 //   A specialized dialog for actions requiring user confirmation (e.g., cancelling
 //   appointments, deleting doctor profiles, or deactivating user accounts).
 //
-// DESIGN & FEATURES:
-//   - Wraps the reusable `Modal` component
-//   - Support danger styling (red confirm button for destructive actions)
-//   - Supports custom confirm and cancel labels
+// DESIGN & FEATURES (CONCIERGE CLINIC):
+//   - Elegant serif titles (Playfair Display)
+//   - Custom clinical-themed layout using brand colors
+//   - Support danger styling (terracotta button for destructive actions)
+//   - Replaces heavy shadows with 1px muted sage hairline boundaries
 // ==============================================================================
 
 import React from 'react';
@@ -24,8 +25,8 @@ interface ConfirmDialogProps {
   confirmLabel?: string;
   cancelLabel?: string;
   
-  // If true, highlights the action as destructive/danger (uses red buttons)
-  // If false, uses standard brand buttons (emerald/green)
+  // If true, highlights the action as destructive/danger (uses terracotta accent buttons)
+  // If false, uses standard brand buttons (forest green)
   isDanger?: boolean;
   
   // Displays a loading state spinner inside the confirm button during async ops
@@ -54,26 +55,28 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
-      <div className="flex flex-col items-center text-center space-y-4 pt-2">
+      <div className="flex flex-col items-center text-center space-y-4 pt-1">
         {/* Warning Alert Icon */}
-        <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${
-          isDanger ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'
+        <div className={`flex h-12 w-12 items-center justify-center rounded-xl border ${
+          isDanger 
+            ? 'bg-clinic-terracotta-50 dark:bg-clinic-terracotta-500/10 text-clinic-terracotta-500 border-clinic-terracotta-100 dark:border-clinic-terracotta-500/20' 
+            : 'bg-clinic-sage-50 dark:bg-clinic-sage-500/10 text-clinic-forest-500 border-clinic-sage-200/50 dark:border-slate-800'
         }`}>
-          <AlertTriangle size={28} />
+          <AlertTriangle size={20} />
         </div>
 
         {/* Message body text */}
-        <p className="text-sm text-slate-600 font-medium leading-relaxed">
+        <p className="text-sm text-clinic-text/80 dark:text-slate-300 font-medium leading-relaxed max-w-xs">
           {message}
         </p>
 
         {/* Action Controls */}
-        <div className="flex items-center space-x-3 w-full pt-4 border-t border-slate-100 mt-6">
+        <div className="flex items-center space-x-3 w-full pt-4 border-t border-clinic-sage-200/30 dark:border-slate-800/80 mt-6">
           <button
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold py-2.5 px-4 rounded-xl text-sm border border-slate-200 transition-all duration-200"
+            className="flex-1 bg-white dark:bg-slate-900 hover:bg-clinic-sage-50 dark:hover:bg-slate-800 text-clinic-text/85 dark:text-slate-300 font-sans font-bold py-2.5 px-4 rounded-xl text-[10px] uppercase tracking-wider border border-clinic-sage-200 dark:border-slate-800 transition-all duration-200"
           >
             {cancelLabel}
           </button>
@@ -82,13 +85,13 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             type="button"
             onClick={handleConfirm}
             disabled={isLoading}
-            className={`flex-1 flex items-center justify-center space-x-2 text-white font-semibold py-2.5 px-4 rounded-xl text-sm shadow-md transition-all duration-200 ${
+            className={`flex-1 flex items-center justify-center space-x-2 text-white font-sans font-bold py-2.5 px-4 rounded-xl text-[10px] uppercase tracking-wider shadow-premium hover:shadow-premium-hover transition-all duration-200 ${
               isDanger
-                ? 'bg-red-500 hover:bg-red-600 shadow-red-100 hover:shadow-red-200'
-                : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-100 hover:shadow-emerald-200'
+                ? 'bg-clinic-terracotta-500 hover:bg-clinic-terracotta-600'
+                : 'bg-clinic-forest-500 hover:bg-clinic-forest-600'
             }`}
           >
-            {isLoading && <Loader2 size={16} className="animate-spin" />}
+            {isLoading && <Loader2 size={12} className="animate-spin" />}
             <span>{confirmLabel}</span>
           </button>
         </div>

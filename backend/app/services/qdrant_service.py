@@ -29,7 +29,7 @@
 #   - Vector: The 384-dimensional number array representing text meaning
 # ==============================================================================
 
-from typing import Optional
+from typing import Optional, List, Dict
 from fastembed import TextEmbedding
 from qdrant_client import QdrantClient, AsyncQdrantClient
 from qdrant_client.models import (
@@ -88,7 +88,7 @@ def get_embedding_model() -> TextEmbedding:
     return _embedding_model
 
 
-def embed_text(text: str) -> list[float]:
+def embed_text(text: str) -> List[float]:
     """
     Converts a text string into a 384-dimensional vector embedding.
     Uses FastEmbed with the BAAI/bge-small-en-v1.5 model.
@@ -109,7 +109,7 @@ def embed_text(text: str) -> list[float]:
     return embeddings[0].tolist()
 
 
-def embed_texts(texts: list[str]) -> list[list[float]]:
+def embed_texts(texts: List[str]) -> List[List[float]]:
     """
     Converts multiple text strings into vectors in one batch call.
     More efficient than calling embed_text() in a loop.
@@ -249,7 +249,7 @@ class QdrantService:
     @staticmethod
     def upsert_points(
         collection_name: str,
-        points: list[dict]
+        points: List[Dict]
     ) -> bool:
         """
         Inserts or updates vector points in a Qdrant collection.
@@ -313,7 +313,7 @@ class QdrantService:
         top_k: int = 5,
         score_threshold: float = 0.3,
         filter_type: Optional[str] = None
-    ) -> list[ScoredPoint]:
+    ) -> List[ScoredPoint]:
         """
         Performs semantic vector search in Qdrant.
         Converts the query text to a vector and finds similar stored vectors.

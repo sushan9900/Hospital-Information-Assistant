@@ -16,7 +16,7 @@
 # ==============================================================================
 
 from pydantic import BaseModel, Field, field_validator
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from app.models.appointment import AppointmentStatus
 
@@ -306,7 +306,7 @@ class AppointmentListResponse(BaseModel):
     """
 
     total: int = Field(description="Total number of appointments")
-    appointments: list[AppointmentResponse] = Field(
+    appointments: List[AppointmentResponse] = Field(
         description="List of appointment objects"
     )
 

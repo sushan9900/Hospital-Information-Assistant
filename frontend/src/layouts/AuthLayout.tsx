@@ -8,9 +8,11 @@
 //     - Right Side : A modern welcome banner highlighting the platform's AI RAG
 //                    and scheduling capabilities.
 //
-// SECURITY / AUTO-REDIRECT:
-//   If a user is ALREADY authenticated and tries to visit `/login` or `/register`,
-//   this layout automatically catches them and redirects them to the `/dashboard`.
+// DESIGN & AESTHETICS (CONCIERGE CLINIC):
+//   - Left viewport rests on global warm ivory paper background
+//   - Right welcome banner in rich, deep forest green (editorial brand contrast)
+//   - Playfair Display serif fonts for title headings
+//   - Subtle rounded boxes with thin sage hairline dividers
 // ==============================================================================
 
 import React, { useEffect } from 'react';
@@ -32,7 +34,7 @@ export const AuthLayout: React.FC = () => {
 
   // Show a full-screen loading spinner while the auth state is being verified
   if (isLoading) {
-    return <LoadingSpinner fullScreen message="Verifying session credentials..." />;
+    return <LoadingSpinner fullScreen message="Verifying credentials..." />;
   }
 
   // If authenticated, render nothing while redirecting
@@ -41,69 +43,72 @@ export const AuthLayout: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-clinic-bg dark:bg-slate-950 transition-all duration-300">
       
       {/* LEFT COLUMN: AUTHENTICATION FORM VIEWPORT */}
-      <div className="flex flex-col flex-1 justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+      <div className="flex flex-col flex-1 justify-center px-6 py-12 sm:px-12 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <Outlet />
         </div>
       </div>
 
       {/* RIGHT COLUMN: WELCOME BRANDING PANEL (DESKTOP ONLY) */}
-      <div className="hidden lg:relative lg:flex lg:flex-1 bg-slate-950 items-center justify-center overflow-hidden">
+      <div className="hidden lg:relative lg:flex lg:flex-1 bg-clinic-forest-500 dark:bg-slate-900 items-center justify-center overflow-hidden border-l border-clinic-sage-200/20 dark:border-slate-800">
         
-        {/* Decorative Background Glows */}
-        <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-teal-500/10 blur-3xl" />
+        {/* Soft elegant glows (sage-forest tones) */}
+        <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-clinic-sage-500/10 blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-clinic-sage-500/5 blur-3xl" />
 
-        <div className="relative z-10 max-w-md px-8 text-center space-y-8">
+        <div className="relative z-10 max-w-md px-10 text-center space-y-8">
+          
           {/* Logo Branding */}
           <div className="flex justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-xl shadow-emerald-500/20">
-              <Activity size={32} />
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/10 text-white border border-white/15 shadow-premium">
+              <Activity size={24} />
             </div>
           </div>
 
           {/* Heading */}
-          <div className="space-y-3">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">
-              Hospital Information Assistant
+          <div className="space-y-3.5">
+            <h1 className="font-serif italic text-4xl text-white tracking-tight leading-tight">
+              Hospital AI Assistant
             </h1>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              Your comprehensive portal for doctor matching, online scheduling, and instant AI-assisted medical answers.
+            <p className="text-xs text-clinic-sage-100/80 leading-relaxed font-sans font-medium">
+              Your secure portal for doctor profiles, online scheduling, and instant AI-assisted medical consultations.
             </p>
           </div>
 
-          {/* Core Feature bullet points */}
-          <div className="text-left space-y-4 bg-slate-900/50 border border-slate-800 p-6 rounded-2xl backdrop-blur-md">
-            <div className="flex items-start space-x-3">
-              <Sparkles className="text-emerald-400 mt-1 flex-shrink-0" size={18} />
+          {/* Feature highlights */}
+          <div className="text-left space-y-4 bg-white/5 dark:bg-slate-950/40 border border-white/10 dark:border-slate-800 p-6 rounded-xl backdrop-blur-md">
+            
+            <div className="flex items-start space-x-3.5">
+              <Sparkles className="text-clinic-sage-200 mt-0.5 flex-shrink-0" size={16} />
               <div>
-                <h4 className="text-sm font-bold text-white">Interactive AI Chat</h4>
-                <p className="text-xs text-slate-400 mt-0.5">Context-aware conversational assistance that remembers your queries.</p>
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider font-sans">Interactive Chatbot</h4>
+                <p className="text-[11px] text-clinic-sage-100/70 mt-0.5 font-medium leading-relaxed">Context-aware conversational assistance that remembers your inquiry threads.</p>
               </div>
             </div>
             
-            <div className="flex items-start space-x-3">
-              <ShieldCheck className="text-emerald-400 mt-1 flex-shrink-0" size={18} />
+            <div className="flex items-start space-x-3.5">
+              <ShieldCheck className="text-clinic-sage-200 mt-0.5 flex-shrink-0" size={16} />
               <div>
-                <h4 className="text-sm font-bold text-white">Grounded Q&A (RAG)</h4>
-                <p className="text-xs text-slate-400 mt-0.5">Accurate replies based directly on validated hospital records.</p>
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider font-sans">Grounded Answers (RAG)</h4>
+                <p className="text-[11px] text-clinic-sage-100/70 mt-0.5 font-medium leading-relaxed">Accurate replies based directly on validated hospital department documents.</p>
               </div>
             </div>
             
-            <div className="flex items-start space-x-3">
-              <Heart className="text-emerald-400 mt-1 flex-shrink-0" size={18} />
+            <div className="flex items-start space-x-3.5">
+              <Heart className="text-clinic-sage-200 mt-0.5 flex-shrink-0" size={16} />
               <div>
-                <h4 className="text-sm font-bold text-white">Smooth Scheduling</h4>
-                <p className="text-xs text-slate-400 mt-0.5">Quickly book and manage appointments with preferred doctors.</p>
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider font-sans">Premium Scheduling</h4>
+                <p className="text-[11px] text-clinic-sage-100/70 mt-0.5 font-medium leading-relaxed">Instantly book and manage consultations with certified physicians.</p>
               </div>
             </div>
+
           </div>
 
           {/* Footer Label */}
-          <div className="text-xs text-slate-600 font-medium">
+          <div className="text-[9px] text-clinic-sage-100/50 font-bold uppercase tracking-widest">
             Protected by secure JWT authorization & encryption
           </div>
 
