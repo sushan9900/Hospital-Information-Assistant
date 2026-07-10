@@ -93,14 +93,20 @@ app = FastAPI(
 # WHAT: Configures CORS headers to allow frontend access.
 # ------------------------------------------------------------------------------
 # Default allow-all for development if BACKEND_CORS_ORIGINS is empty
-origins = settings.get_allowed_origins()
+# ------------------------------------------------------------------------------
+# CORS MIDDLEWARE
+# ------------------------------------------------------------------------------
+origins = [
+    "http://localhost:5173",
+    "https://hospital-information-assistant.vercel.app",
+]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"],  # Allow all headers (Authorization, Content-Type, etc.)
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
