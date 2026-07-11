@@ -1,19 +1,3 @@
-# ==============================================================================
-# Hospital Information Assistance — Departments Router
-# ==============================================================================
-# WHY THIS FILE EXISTS:
-#   Defines all HTTP endpoints for hospital department management.
-#   Departments are PUBLIC data — anyone can list and view departments.
-#   Creating, updating, and deleting departments is restricted to admins.
-#
-# ENDPOINTS:
-#   GET    /departments              → List all departments (public)
-#   POST   /departments              → Create a department (admin only)
-#   GET    /departments/{dept_id}    → Get department detail with doctors (public)
-#   PUT    /departments/{dept_id}    → Update a department (admin only)
-#   DELETE /departments/{dept_id}    → Delete a department (admin only)
-# ==============================================================================
-
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
@@ -35,12 +19,7 @@ from app.services.department_service import DepartmentService
 router = APIRouter()
 
 
-# ==============================================================================
-# LIST ALL DEPARTMENTS
-# Method: GET
-# Path:   /departments
-# Access: PUBLIC (no authentication required)
-# ==============================================================================
+
 @router.get(
     "/",
     response_model=DepartmentListResponse,
@@ -86,12 +65,6 @@ async def list_departments(
     )
 
 
-# ==============================================================================
-# CREATE DEPARTMENT (ADMIN ONLY)
-# Method: POST
-# Path:   /departments
-# Access: Admin only
-# ==============================================================================
 @router.post(
     "/",
     response_model=DepartmentResponse,
@@ -128,12 +101,6 @@ async def create_department(
     return await DepartmentService.create_department(db=db, dept_data=dept_data)
 
 
-# ==============================================================================
-# GET DEPARTMENT DETAIL
-# Method: GET
-# Path:   /departments/{dept_id}
-# Access: PUBLIC (no authentication required)
-# ==============================================================================
 @router.get(
     "/{dept_id}",
     response_model=DepartmentDetailResponse,
@@ -170,13 +137,6 @@ async def get_department(
     return await DepartmentService.get_department_by_id(db=db, dept_id=dept_id)
 
 
-# ==============================================================================
-# UPDATE DEPARTMENT (ADMIN ONLY)
-# Method: PUT
-# Path:   /departments/{dept_id}
-# Access: Admin only
-# ==============================================================================
-@router.put(
     "/{dept_id}",
     response_model=DepartmentResponse,
     status_code=status.HTTP_200_OK,
@@ -221,12 +181,6 @@ async def update_department(
     )
 
 
-# ==============================================================================
-# DELETE DEPARTMENT (ADMIN ONLY)
-# Method: DELETE
-# Path:   /departments/{dept_id}
-# Access: Admin only
-# ==============================================================================
 @router.delete(
     "/{dept_id}",
     status_code=status.HTTP_200_OK,

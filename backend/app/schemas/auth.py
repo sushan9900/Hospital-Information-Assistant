@@ -1,29 +1,9 @@
-# ==============================================================================
-# Hospital Information Assistance — Auth Pydantic Schemas
-# ==============================================================================
-# WHY THIS FILE EXISTS:
-#   This file defines the request and response shapes for all authentication
-#   related API endpoints — login, token response, and token data.
-#
-# AUTHENTICATION FLOW:
-#   1. User sends POST /auth/login with email + password
-#   2. Server verifies credentials and creates a JWT token
-#   3. Server returns the token in a LoginResponse
-#   4. Client stores the token and sends it in every future request:
-#      Authorization: Bearer <token>
-#   5. Server decodes the token using TokenData to identify the user
-# ==============================================================================
-
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from app.schemas.user import UserResponse
 
 
-# ------------------------------------------------------------------------------
-# LOGIN REQUEST SCHEMA (REQUEST)
-# WHY: Defines what the client must send to log in.
-# INPUT: Sent in the request body of POST /auth/login
-# ------------------------------------------------------------------------------
+
 class LoginRequest(BaseModel):
     """
     Schema for user login requests.
@@ -60,12 +40,7 @@ class LoginRequest(BaseModel):
     }
 
 
-# ------------------------------------------------------------------------------
-# TOKEN SCHEMA (RESPONSE)
-# WHY: The standard OAuth2 token response format.
-#      Returns the JWT access token and the token type.
-# OUTPUT: Returned from POST /auth/login
-# ------------------------------------------------------------------------------
+
 class Token(BaseModel):
     """
     Schema for the JWT token returned after successful login.
@@ -73,8 +48,6 @@ class Token(BaseModel):
     Used in: POST /auth/login response
     """
 
-    # The JWT access token string
-    # Client stores this and sends it in: Authorization: Bearer <access_token>
     access_token: str = Field(
         description="JWT access token to include in future requests"
     )
@@ -97,13 +70,6 @@ class Token(BaseModel):
     }
 
 
-# ------------------------------------------------------------------------------
-# LOGIN RESPONSE SCHEMA (RESPONSE)
-# WHY: Returns both the JWT token AND the user details in one response.
-#      This saves the client from making an extra request to /users/me
-#      after login — the user data is immediately available.
-# OUTPUT: Returned from POST /auth/login
-# ------------------------------------------------------------------------------
 class LoginResponse(BaseModel):
     """
     Extended login response that includes the token AND the user profile.
@@ -148,14 +114,7 @@ class LoginResponse(BaseModel):
     }
 
 
-# ------------------------------------------------------------------------------
-# TOKEN DATA SCHEMA (INTERNAL)
-# WHY: When a JWT token arrives in a request, we decode it and extract
-#      the user information embedded inside. This schema represents the
-#      structure of the data stored inside the JWT payload.
-# WHAT: Used internally by the dependency that verifies tokens.
-#       NOT sent to or from the client directly.
-# ------------------------------------------------------------------------------
+
 class TokenData(BaseModel):
     """
     Schema representing the data decoded from a JWT token payload.
@@ -163,8 +122,6 @@ class TokenData(BaseModel):
     NOT an API request/response schema — used only inside the backend.
     """
 
-    # The user's email address extracted from the JWT payload
-    # We use email as the "subject" (sub) field of the JWT
     email: Optional[str] = Field(
         default=None,
         description="User email extracted from JWT token payload"
@@ -183,13 +140,6 @@ class TokenData(BaseModel):
     )
 
 
-# ------------------------------------------------------------------------------
-# REGISTER RESPONSE SCHEMA (RESPONSE)
-# WHY: Returns a success message and the newly created user after registration.
-#      Lets the client know registration was successful without needing
-#      an immediate login request.
-# OUTPUT: Returned from POST /auth/register
-# ------------------------------------------------------------------------------
 class RegisterResponse(BaseModel):
     """
     Response returned after successful user registration.

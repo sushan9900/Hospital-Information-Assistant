@@ -1,21 +1,3 @@
-# ==============================================================================
-# Hospital Information Assistance — Users Router
-# ==============================================================================
-# WHY THIS FILE EXISTS:
-#   Defines all HTTP endpoints for user profile management.
-#   Separate from auth.py (which handles login/register) — this file handles
-#   everything that happens to a user AFTER they are already authenticated.
-#
-# ENDPOINTS:
-#   GET    /users/me              → Get own profile
-#   PUT    /users/me              → Update own profile
-#   PUT    /users/me/password     → Change own password
-#   GET    /users                 → List all users (admin only)
-#   GET    /users/{user_id}       → Get any user by ID (admin only)
-#   PATCH  /users/{user_id}/deactivate  → Deactivate user (admin only)
-#   PATCH  /users/{user_id}/reactivate  → Reactivate user (admin only)
-# ==============================================================================
-
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
@@ -35,13 +17,6 @@ from app.services.user_service import UserService
 # Create the router
 router = APIRouter()
 
-
-# ==============================================================================
-# GET CURRENT USER'S PROFILE
-# Method: GET
-# Path:   /users/me
-# Access: Protected (any logged-in user)
-# ==============================================================================
 @router.get(
     "/me",
     response_model=UserResponse,
@@ -62,13 +37,6 @@ async def get_my_profile(
     """
     return await UserService.get_my_profile(current_user=current_user)
 
-
-# ==============================================================================
-# UPDATE CURRENT USER'S PROFILE
-# Method: PUT
-# Path:   /users/me
-# Access: Protected (any logged-in user)
-# ==============================================================================
 @router.put(
     "/me",
     response_model=UserResponse,
@@ -108,12 +76,6 @@ async def update_my_profile(
     )
 
 
-# ==============================================================================
-# CHANGE CURRENT USER'S PASSWORD
-# Method: PUT
-# Path:   /users/me/password
-# Access: Protected (any logged-in user)
-# ==============================================================================
 @router.put(
     "/me/password",
     status_code=status.HTTP_200_OK,
@@ -150,12 +112,6 @@ async def change_my_password(
     )
 
 
-# ==============================================================================
-# LIST ALL USERS (ADMIN ONLY)
-# Method: GET
-# Path:   /users
-# Access: Admin only
-# ==============================================================================
 @router.get(
     "/",
     response_model=UserListResponse,
@@ -198,12 +154,6 @@ async def list_all_users(
     )
 
 
-# ==============================================================================
-# GET USER BY ID (ADMIN ONLY)
-# Method: GET
-# Path:   /users/{user_id}
-# Access: Admin only
-# ==============================================================================
 @router.get(
     "/{user_id}",
     response_model=UserResponse,
@@ -233,12 +183,6 @@ async def get_user_by_id(
     return await UserService.get_user_by_id(db=db, user_id=user_id)
 
 
-# ==============================================================================
-# DEACTIVATE USER (ADMIN ONLY — SOFT DELETE)
-# Method: PATCH
-# Path:   /users/{user_id}/deactivate
-# Access: Admin only
-# ==============================================================================
 @router.patch(
     "/{user_id}/deactivate",
     status_code=status.HTTP_200_OK,
@@ -276,12 +220,6 @@ async def deactivate_user(
     )
 
 
-# ==============================================================================
-# REACTIVATE USER (ADMIN ONLY)
-# Method: PATCH
-# Path:   /users/{user_id}/reactivate
-# Access: Admin only
-# ==============================================================================
 @router.patch(
     "/{user_id}/reactivate",
     status_code=status.HTTP_200_OK,

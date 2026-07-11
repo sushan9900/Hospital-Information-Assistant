@@ -1,25 +1,3 @@
-# ==============================================================================
-# Hospital Information Assistance — Authentication Router
-# ==============================================================================
-# WHY THIS FILE EXISTS:
-#   This file defines all HTTP endpoints for user authentication.
-#   Routers in FastAPI connect URL paths to service functions.
-#   Routers should be THIN — no business logic here, only:
-#     - Define the route (path + HTTP method)
-#     - Extract request data
-#     - Call the service
-#     - Return the response
-#
-# ENDPOINTS:
-#   POST /auth/register → Register a new user account
-#   POST /auth/login    → Login and receive a JWT token
-#   GET  /auth/me       → Get the current user's profile (requires auth)
-#
-# HOW ROUTERS CONNECT TO THE APP:
-#   This router is imported and registered in main.py:
-#   app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
-# ==============================================================================
-
 from fastapi import APIRouter, Depends, status, Request, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -35,13 +13,6 @@ from app.services.auth_service import AuthService
 # Create the router — all routes defined here will be prefixed with /auth
 router = APIRouter()
 
-
-# ==============================================================================
-# REGISTER NEW USER
-# Method: POST
-# Path:   /auth/register  (becomes /auth/register with prefix in main.py)
-# Access: Public (no authentication required)
-# ==============================================================================
 @router.post(
     "/register",
     response_model=RegisterResponse,
@@ -84,12 +55,6 @@ async def register(
     return await AuthService.register_user(db=db, user_data=user_data)
 
 
-# ==============================================================================
-# USER LOGIN
-# Method: POST
-# Path:   /auth/login
-# Access: Public (no authentication required)
-# ==============================================================================
 @router.post(
     "/login",
     response_model=LoginResponse,
@@ -119,12 +84,6 @@ async def login(
     return await AuthService.login_user(db=db, login_data=login_data)
 
 
-# ==============================================================================
-# OAUTH2 COMPATIBLE TOKEN LOGIN (For Swagger UI)
-# Method: POST
-# Path:   /auth/token
-# Access: Public
-# ==============================================================================
 @router.post(
     "/token",
     response_model=LoginResponse,
@@ -140,12 +99,7 @@ async def login_swagger(
     return await AuthService.login_user(db=db, login_data=login_data)
 
 
-# ==============================================================================
-# GET CURRENT USER PROFILE
-# Method: GET
-# Path:   /auth/me
-# Access: Protected (requires valid JWT token)
-# ==============================================================================
+
 @router.get(
     "/me",
     response_model=UserResponse,
@@ -179,6 +133,4 @@ async def get_current_user_profile(
     - 401 Unauthorized: Account not found or deactivated
     """
 
-    # The user is already loaded and validated by the get_current_user dependency
-    # Just return it — Pydantic will serialize it automatically
     return UserResponse.model_validate(current_user)

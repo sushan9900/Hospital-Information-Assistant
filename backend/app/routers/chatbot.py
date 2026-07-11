@@ -1,19 +1,3 @@
-# ==============================================================================
-# Hospital Information Assistance — Chatbot Router
-# ==============================================================================
-# WHY THIS FILE EXISTS:
-#   Defines the HTTP endpoints for interacting with the AI chatbot.
-#   It connects client requests to the AIService layer, which uses LangChain
-#   and Groq to generate responses with context memory.
-#
-# ENDPOINTS:
-#   POST   /chat                                      → Send a chat message (user)
-#   POST   /chat/sessions                             → Create a new chat session
-#   GET    /chat/sessions                             → List all user chat sessions
-#   GET    /chat/sessions/{session_id}/history        → Get full history for a session
-#   DELETE /chat/sessions/{session_id}/clear          → Clear memory of a session
-# ==============================================================================
-
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
@@ -35,12 +19,6 @@ from app.services.ai_service import AIService
 router = APIRouter()
 
 
-# ==============================================================================
-# SEND CHAT MESSAGE
-# Method: POST
-# Path:   /chat
-# Access: Protected (any logged-in user)
-# ==============================================================================
 @router.post(
     "/",
     response_model=ChatResponse,
@@ -85,13 +63,6 @@ async def send_message(
         current_user=current_user
     )
 
-
-# ==============================================================================
-# CREATE A CHAT SESSION
-# Method: POST
-# Path:   /chat/sessions
-# Access: Protected (any logged-in user)
-# ==============================================================================
 @router.post(
     "/sessions",
     response_model=SessionResponse,
@@ -126,12 +97,6 @@ async def create_session(
     )
 
 
-# ==============================================================================
-# GET USER CHAT SESSIONS
-# Method: GET
-# Path:   /chat/sessions
-# Access: Protected (any logged-in user)
-# ==============================================================================
 @router.get(
     "/sessions",
     response_model=SessionListResponse,
@@ -165,12 +130,6 @@ async def list_sessions(
     )
 
 
-# ==============================================================================
-# GET CHAT SESSION HISTORY
-# Method: GET
-# Path:   /chat/sessions/{session_id}/history
-# Access: Protected (session owner only)
-# ==============================================================================
 @router.get(
     "/sessions/{session_id}/history",
     response_model=ChatHistoryResponse,
@@ -204,12 +163,6 @@ async def get_session_history_route(
     )
 
 
-# ==============================================================================
-# CLEAR CHAT SESSION HISTORY
-# Method: DELETE
-# Path:   /chat/sessions/{session_id}/clear
-# Access: Protected (session owner only)
-# ==============================================================================
 @router.delete(
     "/sessions/{session_id}/clear",
     status_code=status.HTTP_200_OK,

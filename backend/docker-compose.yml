@@ -1,24 +1,3 @@
-# ==============================================================================
-# Hospital Information Assistance — Docker Compose Configuration
-# ==============================================================================
-# WHY THIS FILE EXISTS:
-#   This file allows you to spin up the backend service in a single command:
-#   ```bash
-#   docker-compose up --build
-#   ```
-#   It maps ports, mounts local code for live-reloading during development,
-#   and sets up environment variables.
-#
-# DATABASE & VECTOR STORE OPTIONS:
-#   By default, this config connects to:
-#   - PostgreSQL hosted on Neon Cloud (via settings in .env)
-#   - Qdrant Vector DB hosted on Qdrant Cloud (via settings in .env)
-#
-#   Commented-out local service containers (PostgreSQL and Qdrant) are
-#   provided at the bottom of this file in case you want to run the entire
-#   stack locally in the future.
-# ==============================================================================
-
 version: '3.8'
 
 services:

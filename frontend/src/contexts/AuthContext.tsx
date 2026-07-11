@@ -7,12 +7,18 @@
 //   are logged in, who they are, their role, and the active token) and shares it
 //   with all components in the application.
 //
-// HOW STATE PERSISTENCE WORKS:
-//   1. When the app loads, `useEffect` checks if a token exists in `localStorage`.
-//   2. If a token exists, it calls the `/auth/me` endpoint to verify it.
-//   3. If valid, the user's profile is loaded into the state, and the app mounts.
-//   4. If invalid (expired), the session is cleared, and they are redirected to login.
-//   5. On login, credentials are saved to `localStorage` and this context state.
+// FIX NOTE (IMPORTANT):
+//   `isLoading` used to be shared between (a) the initial app bootstrap check
+//   ("is there a valid token already?") and (b) the login/register button
+//   spinner. AuthLayout was gating its full-screen spinner AND conditionally
+//   unmounting <Outlet/> based on that same `isLoading` flag. This meant every
+//   login attempt caused AuthLayout to unmount LoginPage (wiping its local
+//   error state) and then remount a brand new LoginPage once loading finished
+//   - so any error message set right before submission finished was destroyed
+//   a moment later by the remount. We now use a SEPARATE `isInitializing` flag
+//   for the one-time bootstrap check, and keep `isLoading` scoped to login/
+//   register button loading state only. AuthLayout should gate on
+//   `isInitializing`, not `isLoading`.
 // ==============================================================================
 
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
@@ -25,6 +31,7 @@ export interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitializing: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (fullName: string, email: string, password: string, confirmPassword: string) => Promise<void>;
   logout: () => void;
@@ -41,7 +48,15 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // isInitializing: true ONLY during the one-time app bootstrap token check.
+  // AuthLayout should use THIS flag to decide whether to show the full-screen
+  // "Verifying credentials..." spinner, NOT isLoading.
+  const [isInitializing, setIsInitializing] = useState<boolean>(true);
+
+  // isLoading: scoped to login/register button-level loading state only.
+  // Do NOT gate layout mounting/unmounting on this flag.
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Derived state for convenience
   const isAuthenticated = !!token && !!user;
@@ -60,7 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (storedUser) {
           setUser(storedUser);
         }
-        
+
         try {
           // Verify token against backend `/auth/me` endpoint
           const freshUserProfile = await authService.getMe();
@@ -72,8 +87,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           handleLogout();
         }
       }
-      
-      setIsLoading(false);
+
+      // Bootstrap check is done - stop showing the full-screen verifying spinner
+      setIsInitializing(false);
     };
 
     initializeAuth();
@@ -82,6 +98,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // ----------------------------------------------------------------------------
   // LOGIN ACTION
   // WHY: Calls authService login, updates local state.
+  // NOTE: Uses `isLoading` (button-scoped) only - does NOT touch
+  //       `isInitializing`, so AuthLayout will NOT unmount LoginPage while
+  //       a login attempt is in flight or has just failed.
   // ----------------------------------------------------------------------------
   const handleLogin = async (email: string, password: string): Promise<void> => {
     setIsLoading(true);
@@ -124,7 +143,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authService.logout();
     setToken(null);
     setUser(null);
-    setIsLoading(false);
   };
 
   // ----------------------------------------------------------------------------
@@ -143,6 +161,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         token,
         isAuthenticated,
         isLoading,
+        isInitializing,
         login: handleLogin,
         register: handleRegister,
         logout: handleLogout,
