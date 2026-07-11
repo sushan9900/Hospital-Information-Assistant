@@ -1,3 +1,8 @@
+from app import database
+from app import database
+from app import database
+from app import database
+from app import database
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
@@ -132,18 +137,15 @@ async def get_department(
     - Total doctor count
 
     Errors:
-    - 404 Not Found: Department with that ID does not exist
+  - 404 Not Found: Department with that ID does not exist
     """
     return await DepartmentService.get_department_by_id(
-    db=db,
-    dept_id=dept_id
-)
+        db=db,
+        dept_id=dept_id
+    )
 
 
-<<<<<<< HEAD
 @router.put(
-=======
->>>>>>> acfe9acd7bd3b22d19d9940b78b9ea464350cac5
     "/{dept_id}",
     response_model=DepartmentResponse,
     status_code=status.HTTP_200_OK,
@@ -158,7 +160,7 @@ async def update_department(
     dept_id: int,
     dept_data: DepartmentUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin)  # Admin only
+    current_user: User = Depends(get_current_admin)
 ) -> DepartmentResponse:
     """
     Update a department's information (partial update).
