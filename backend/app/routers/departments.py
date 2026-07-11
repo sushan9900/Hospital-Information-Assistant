@@ -140,7 +140,10 @@ async def get_department(
 )
 
 
+<<<<<<< HEAD
 @router.put(
+=======
+>>>>>>> acfe9acd7bd3b22d19d9940b78b9ea464350cac5
     "/{dept_id}",
     response_model=DepartmentResponse,
     status_code=status.HTTP_200_OK,
