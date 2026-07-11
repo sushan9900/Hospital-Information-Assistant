@@ -23,6 +23,7 @@
 # ==============================================================================
 
 import time
+import asyncio
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -32,7 +33,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from app.config import settings
 from app.models.doctor import Doctor
 from app.models.department import Department
-from app.services.qdrant_service import QdrantService, embed_text
+from app.services.qdrant_service import QdrantService, embed_text, embed_texts
 from app.schemas.rag import (
     RAGEmbedRequest,
     RAGEmbedResponse,
@@ -189,7 +190,8 @@ class RAGService:
         departments_embedded = 0
 
         # Step 1: Create or recreate the Qdrant collection
-        QdrantService.create_collection(
+        await asyncio.to_thread(
+            QdrantService.create_collection,
             collection_name=collection_name,
             recreate=embed_request.force_rebuild  # Delete old if force_rebuild=True
         )
@@ -203,8 +205,9 @@ class RAGService:
             )
             doctors = result.scalars().all()
 
-            # Build points list for Qdrant
-            doctor_points = []
+            # Build contents list for batch embedding
+            contents = []
+            metadata_list = []
             for doctor in doctors:
                 # Build the text content to embed
                 # Include all meaningful text fields for rich semantic search
@@ -226,32 +229,36 @@ class RAGService:
                     content_parts.append(f"Department: {doctor.department.name}")
 
                 content = " | ".join(content_parts)
+                contents.append(content)
+                metadata_list.append((doctor, content))
 
-                # Generate the embedding vector for this doctor
-                vector = embed_text(content)
+            # Batch generate vectors in worker thread
+            if contents:
+                vectors = await asyncio.to_thread(embed_texts, contents)
 
-                # Build the Qdrant point
-                doctor_points.append({
-                    "id": f"doctor_{doctor.id}",  # Unique point ID
-                    "vector": vector,
-                    "payload": {
-                        "type": "doctor",
-                        "record_id": doctor.id,
-                        "content": content,
-                        "name": doctor.full_name,
-                        "specialization": doctor.specialization,
-                        "department": doctor.department.name if doctor.department else None,
-                        "experience_years": doctor.experience_years,
-                        "available_days": doctor.available_days,
-                        "consultation_fee": doctor.consultation_fee,
-                        "phone": doctor.phone,
-                        "email": doctor.email,
-                    }
-                })
+                # Build the Qdrant points
+                doctor_points = []
+                for idx, (doctor, content) in enumerate(metadata_list):
+                    doctor_points.append({
+                        "id": f"doctor_{doctor.id}",  # Unique point ID
+                        "vector": vectors[idx],
+                        "payload": {
+                            "type": "doctor",
+                            "record_id": doctor.id,
+                            "content": content,
+                            "name": doctor.full_name,
+                            "specialization": doctor.specialization,
+                            "department": doctor.department.name if doctor.department else None,
+                            "experience_years": doctor.experience_years,
+                            "available_days": doctor.available_days,
+                            "consultation_fee": doctor.consultation_fee,
+                            "phone": doctor.phone,
+                            "email": doctor.email,
+                        }
+                    })
 
-            # Upsert all doctor points into Qdrant in one batch
-            if doctor_points:
-                QdrantService.upsert_points(collection_name, doctor_points)
+                # Upsert all doctor points into Qdrant in worker thread
+                await asyncio.to_thread(QdrantService.upsert_points, collection_name, doctor_points)
                 doctors_embedded = len(doctor_points)
 
         # Step 3: Embed departments (if data_type is "all" or "departments")
@@ -259,7 +266,8 @@ class RAGService:
             result = await db.execute(select(Department))
             departments = result.scalars().all()
 
-            department_points = []
+            contents = []
+            metadata_list = []
             for dept in departments:
                 # Build the text content to embed
                 content_parts = [f"Department: {dept.name}"]
@@ -271,24 +279,30 @@ class RAGService:
                     content_parts.append(f"Phone: {dept.phone}")
 
                 content = " | ".join(content_parts)
-                vector = embed_text(content)
+                contents.append(content)
+                metadata_list.append((dept, content))
 
-                department_points.append({
-                    "id": f"department_{dept.id}",
-                    "vector": vector,
-                    "payload": {
-                        "type": "department",
-                        "record_id": dept.id,
-                        "content": content,
-                        "name": dept.name,
-                        "description": dept.description,
-                        "location": dept.location,
-                        "phone": dept.phone,
-                    }
-                })
+            if contents:
+                vectors = await asyncio.to_thread(embed_texts, contents)
 
-            if department_points:
-                QdrantService.upsert_points(collection_name, department_points)
+                department_points = []
+                for idx, (dept, content) in enumerate(metadata_list):
+                    department_points.append({
+                        "id": f"department_{dept.id}",
+                        "vector": vectors[idx],
+                        "payload": {
+                            "type": "department",
+                            "record_id": dept.id,
+                            "content": content,
+                            "name": dept.name,
+                            "description": dept.description,
+                            "location": dept.location,
+                            "phone": dept.phone,
+                        }
+                    })
+
+                # Upsert all department points in worker thread
+                await asyncio.to_thread(QdrantService.upsert_points, collection_name, department_points)
                 departments_embedded = len(department_points)
 
         time_taken = round(time.time() - start_time, 2)
@@ -330,7 +344,8 @@ class RAGService:
         collection_name = settings.QDRANT_COLLECTION_NAME
 
         # Search Qdrant for similar vectors
-        results = QdrantService.search(
+        results = await asyncio.to_thread(
+            QdrantService.search,
             collection_name=collection_name,
             query_text=search_request.query,
             top_k=search_request.top_k,
@@ -375,7 +390,8 @@ class RAGService:
         collection_name = settings.QDRANT_COLLECTION_NAME
 
         # Step 1: Search Qdrant for relevant records
-        results = QdrantService.search(
+        results = await asyncio.to_thread(
+            QdrantService.search,
             collection_name=collection_name,
             query_text=ask_request.question,
             top_k=ask_request.top_k,
@@ -405,7 +421,7 @@ class RAGService:
         chain = prompt | llm
 
         try:
-            response = chain.invoke({
+            response = await chain.ainvoke({
                 "context": context_string,
                 "question": ask_request.question
             })
@@ -444,7 +460,8 @@ class RAGService:
             RAGOperationResponse with success/failure message.
         """
 
-        QdrantService.delete_point(
+        await asyncio.to_thread(
+            QdrantService.delete_point,
             collection_name=settings.QDRANT_COLLECTION_NAME,
             point_id=delete_request.point_id
         )
@@ -470,7 +487,8 @@ class RAGService:
             RAGOperationResponse with success message.
         """
 
-        QdrantService.delete_all_points(
+        await asyncio.to_thread(
+            QdrantService.delete_all_points,
             collection_name=settings.QDRANT_COLLECTION_NAME
         )
 

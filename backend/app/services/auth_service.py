@@ -18,6 +18,7 @@
 #   result = await AuthService.register_user(db=db, user_data=user_data)
 # ==============================================================================
 
+import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from fastapi import HTTPException, status
@@ -88,7 +89,8 @@ class AuthService:
 
         # Step 2: Hash the plain text password before storing
         # NEVER save user_data.password directly — always hash it first
-        hashed = hash_password(user_data.password)
+        # Run in worker thread to avoid blocking the single-threaded event loop
+        hashed = await asyncio.to_thread(hash_password, user_data.password)
 
         # Step 3: Create a new User SQLAlchemy model instance
         new_user = User(
@@ -154,28 +156,29 @@ class AuthService:
         # Step 1: Find the user by their email address
         user = await AuthService.get_user_by_email(db, login_data.email)
 
-        # Use a generic error message intentionally
-        # Saying "email not found" vs "wrong password" helps attackers
-        # enumerate valid email addresses — so we use the same message for both
-        invalid_credentials_error = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password. Please check your credentials.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
         # If no user found with this email, reject the login
         if user is None:
-            raise invalid_credentials_error
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User does not exist.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
         # Step 2: Verify the submitted password against the stored hash
         # verify_password returns True if they match, False otherwise
-        password_is_correct = verify_password(
+        # Run in worker thread to avoid blocking the single-threaded event loop
+        password_is_correct = await asyncio.to_thread(
+            verify_password,
             plain_password=login_data.password,
             hashed_password=user.hashed_password
         )
 
         if not password_is_correct:
-            raise invalid_credentials_error
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect password.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
         # Step 3: Check that the account is not deactivated
         if not user.is_active:

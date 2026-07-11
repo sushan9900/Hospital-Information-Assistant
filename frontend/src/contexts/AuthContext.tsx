@@ -55,9 +55,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const storedToken = authService.getToken();
       const storedUser = authService.getUser();
 
-      if (storedToken && storedUser) {
+      if (storedToken) {
         setToken(storedToken);
-        setUser(storedUser);
+        if (storedUser) {
+          setUser(storedUser);
+        }
         
         try {
           // Verify token against backend `/auth/me` endpoint

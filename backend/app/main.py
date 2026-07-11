@@ -54,6 +54,13 @@ async def lifespan(app: FastAPI):
         logger.info("Initializing database tables...")
         await create_all_tables()
         logger.info("Database tables initialized successfully.")
+
+        # Step 3: Pre-load FastEmbed embedding model to avoid first-request latency
+        logger.info("Pre-loading FastEmbed embedding model...")
+        import asyncio
+        from app.services.qdrant_service import get_embedding_model
+        await asyncio.to_thread(get_embedding_model)
+        logger.info("FastEmbed embedding model loaded successfully.")
         
     except Exception as e:
         logger.error(f"Startup database initialization failed: {str(e)}")
@@ -96,10 +103,16 @@ app = FastAPI(
 # ------------------------------------------------------------------------------
 # CORS MIDDLEWARE
 # ------------------------------------------------------------------------------
-origins = [
+origins = settings.get_allowed_origins()
+# Ensure standard development and production origins are also allowed
+fallback_origins = [
     "http://localhost:5173",
+    "http://localhost:3000",
     "https://hospital-information-assistant.vercel.app",
 ]
+for origin in fallback_origins:
+    if origin not in origins:
+        origins.append(origin)
 
 app.add_middleware(
     CORSMiddleware,

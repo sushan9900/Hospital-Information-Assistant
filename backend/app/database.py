@@ -17,10 +17,12 @@
 #   - Import `get_db` in routers/dependencies for database access
 # ==============================================================================
 
+from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import text
 from app.config import settings
+
 
 
 # ------------------------------------------------------------------------------
@@ -122,7 +124,7 @@ class Base(DeclarativeBase):
 #   async def my_endpoint(db: AsyncSession = Depends(get_db)):
 #       result = await db.execute(...)
 # ------------------------------------------------------------------------------
-async def get_db() -> AsyncSession:
+async def get_db(request: Request = None) -> AsyncSession:
     """
     FastAPI dependency that provides a database session per request.
     Automatically closes the session when the request is complete.
@@ -134,8 +136,9 @@ async def get_db() -> AsyncSession:
             # Everything inside the router runs here
             yield session
 
-            # If everything went well, commit the transaction
-            await session.commit()
+            # If everything went well, commit for write HTTP methods or when run outside requests (e.g., scripts)
+            if request is None or request.method in ["POST", "PUT", "DELETE", "PATCH"]:
+                await session.commit()
 
         except Exception:
             # If anything went wrong, rollback all changes

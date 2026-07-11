@@ -26,6 +26,7 @@
 # ==============================================================================
 
 import uuid
+import asyncio
 from datetime import datetime
 from typing import Optional, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -243,7 +244,8 @@ class AIService:
         # Step 3: Search Qdrant for hospital documents relevant to the message
         context_str = "No relevant context found."
         try:
-            results = QdrantService.search(
+            results = await asyncio.to_thread(
+                QdrantService.search,
                 collection_name=settings.QDRANT_COLLECTION_NAME,
                 query_text=chat_request.message,
                 top_k=3,

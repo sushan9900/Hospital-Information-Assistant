@@ -1,4 +1,4 @@
-// ==============================================================================
+﻿// ==============================================================================
 // Hospital Information Assistance — Login Page Component
 // ==============================================================================
 // WHY THIS FILE EXISTS:
@@ -26,11 +26,11 @@ export const LoginPage: React.FC = () => {
   // Input states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   // UI states
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [error, setError] = useState('');
   const [infoMsg, setInfoMsg] = useState<string | null>(null);
 
   // Check if redirect was due to expired token session or registration success
@@ -45,12 +45,12 @@ export const LoginPage: React.FC = () => {
   // Handle Form Submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg(null);
+    setError('');
     setInfoMsg(null);
 
     // Simple validation checks
     if (!email || !password) {
-      setErrorMsg('Please enter both email and password.');
+      setError('Please enter both your email and password.');
       return;
     }
 
@@ -59,9 +59,31 @@ export const LoginPage: React.FC = () => {
       await login(email, password);
       // Success redirect to dashboard
       navigate('/dashboard');
-    } catch (error: any) {
-      const apiError = error.response?.data?.detail || 'Login failed. Please check your connection and try again.';
-      setErrorMsg(apiError);
+    } catch (err: any) {
+      if (err.response) {
+        const apiError = err.response.data?.detail || '';
+
+        // Map backend error messages to clear, user-friendly copy.
+        // We intentionally use one generic message for both "user not found"
+        // and "wrong password" so we don't reveal which part was incorrect -
+        // this is a standard security practice that avoids helping an
+        // attacker enumerate valid account emails.
+        if (
+          apiError === 'User does not exist.' ||
+          apiError === 'Incorrect password.'
+        ) {
+          setError('The email or password you entered is incorrect. Please try again.');
+        } else if (err.response.status === 401) {
+          setError('The email or password you entered is incorrect. Please try again.');
+        } else if (err.response.status >= 500) {
+          setError('Something went wrong on our end. Please try again in a moment.');
+        } else {
+          setError(apiError || 'Unable to sign in. Please try again.');
+        }
+      } else {
+        // Backend not reachable / network error
+        setError('Unable to reach the server. Please check your connection and try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +91,7 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      
+
       {/* HEADER LOGO DESCRIPTION */}
       <div className="space-y-2 text-left">
         <h2 className="font-serif text-3xl text-clinic-forest-500 dark:text-slate-100 tracking-tight leading-tight">
@@ -80,14 +102,6 @@ export const LoginPage: React.FC = () => {
         </p>
       </div>
 
-      {/* SESSION NOTIFICATIONS (ERROR / WARNING) */}
-      {errorMsg && (
-        <div className="flex items-start space-x-2.5 p-3.5 rounded-xl border border-clinic-terracotta-100 dark:border-clinic-terracotta-500/20 bg-clinic-terracotta-50/50 dark:bg-clinic-terracotta-500/10 text-clinic-terracotta-600 dark:text-clinic-terracotta-400 text-xs font-semibold animate-in fade-in duration-200">
-          <AlertCircle size={16} className="text-clinic-terracotta-500 flex-shrink-0 mt-0.5" />
-          <span className="leading-relaxed">{errorMsg}</span>
-        </div>
-      )}
-
       {infoMsg && (
         <div className="flex items-start space-x-2.5 p-3.5 rounded-xl border border-clinic-sage-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 text-clinic-forest-500 dark:text-slate-300 text-xs font-semibold animate-in fade-in duration-200">
           <CheckCircle size={16} className="text-clinic-sage-500 flex-shrink-0 mt-0.5" />
@@ -97,7 +111,7 @@ export const LoginPage: React.FC = () => {
 
       {/* LOGIN FORM */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        
+
         {/* Email Field */}
         <div className="space-y-1">
           <label className="text-[9px] font-sans font-bold text-clinic-text/60 dark:text-slate-500 uppercase tracking-widest">
@@ -108,10 +122,13 @@ export const LoginPage: React.FC = () => {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (error) setError('');
+              }}
               placeholder="name@email.com"
               disabled={isLoading}
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-clinic-sage-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm text-clinic-text dark:text-slate-200 placeholder-clinic-sage-500/40 outline-none hover:border-clinic-sage-500 focus:border-clinic-forest-500 dark:focus:border-clinic-forest-500 focus:ring-1 focus:ring-clinic-forest-500/25 transition-all font-semibold"
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-clinic-sage-200 dark:border-slate-800 bg-white dark:bg-slate-955 text-sm text-clinic-text dark:text-slate-200 placeholder-clinic-sage-500/40 outline-none hover:border-clinic-sage-500 focus:border-clinic-forest-500 dark:focus:border-clinic-forest-500 focus:ring-1 focus:ring-clinic-forest-500/25 transition-all font-semibold"
               required
             />
           </div>
@@ -127,7 +144,10 @@ export const LoginPage: React.FC = () => {
             <input
               type={showPassword ? 'text' : 'password'}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (error) setError('');
+              }}
               placeholder="••••••••"
               disabled={isLoading}
               className="w-full pl-10 pr-10 py-3 rounded-xl border border-clinic-sage-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm text-clinic-text dark:text-slate-200 placeholder-clinic-sage-500/40 outline-none hover:border-clinic-sage-500 focus:border-clinic-forest-500 dark:focus:border-clinic-forest-500 focus:ring-1 focus:ring-clinic-forest-500/25 transition-all font-semibold"
@@ -144,6 +164,14 @@ export const LoginPage: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* ERROR MESSAGE — matches clinic's terracotta accent theme */}
+        {error && (
+          <div className="flex items-start space-x-2.5 p-3.5 rounded-xl border border-clinic-terracotta-200 dark:border-clinic-terracotta-900/50 bg-clinic-terracotta-50 dark:bg-clinic-terracotta-950/20 text-clinic-terracotta-600 dark:text-clinic-terracotta-400 text-xs font-semibold animate-in fade-in duration-200">
+            <AlertCircle size={16} className="text-clinic-terracotta-500 flex-shrink-0 mt-0.5" />
+            <span className="leading-relaxed">{error}</span>
+          </div>
+        )}
 
         {/* Submit Button */}
         <button
@@ -183,3 +211,4 @@ export const LoginPage: React.FC = () => {
   );
 };
 export default LoginPage;
+
