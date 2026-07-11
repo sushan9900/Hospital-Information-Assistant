@@ -270,7 +270,7 @@ export const DoctorsPage: React.FC = () => {
       {/* PAGE HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Doctors Directory</h1>
+          <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Doctors Directory</h1>
           <p className="text-sm font-semibold text-slate-400 mt-1">
             Search specialized medical practitioners, inspect profiles, and book slot timings.
           </p>
@@ -289,7 +289,7 @@ export const DoctorsPage: React.FC = () => {
       </div>
 
       {/* FILTER AND SEARCH CONTROLS */}
-      <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm flex flex-col md:flex-row items-center gap-4 justify-between">
+      <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl shadow-sm flex flex-col md:flex-row items-center gap-4 justify-between transition-colors duration-200">
         
         {/* Search Input */}
         <div className="w-full md:w-auto flex-1 max-w-md">
@@ -319,7 +319,7 @@ export const DoctorsPage: React.FC = () => {
               setSelectedDeptId(e.target.value ? Number(e.target.value) : undefined);
               setCurrentPage(1);
             }}
-            className="w-full md:w-48 bg-slate-50 border border-slate-200 text-sm text-slate-700 py-2.5 px-3 rounded-xl outline-none hover:border-slate-300 focus:border-emerald-500 shadow-inner"
+            className="w-full md:w-48 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-300 py-2.5 px-3 rounded-xl outline-none hover:border-slate-300 dark:hover:border-slate-700 focus:border-emerald-500 shadow-inner"
           >
             <option value="">All Departments</option>
             {departments.map((dept) => (
@@ -336,10 +336,10 @@ export const DoctorsPage: React.FC = () => {
       {isLoading ? (
         <LoadingSpinner message="Searching medical practitioners..." />
       ) : doctors.length === 0 ? (
-        <div className="text-center py-20 bg-white border border-slate-100 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-4">
-          <div className="p-4 bg-slate-50 text-slate-400 rounded-full"><Award size={36} /></div>
+        <div className="text-center py-20 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-4">
+          <div className="p-4 bg-slate-50 dark:bg-slate-800 text-slate-400 rounded-full"><Award size={36} /></div>
           <div className="max-w-xs">
-            <h4 className="font-bold text-slate-700 text-sm">No profiles found</h4>
+            <h4 className="font-bold text-slate-700 dark:text-slate-200 text-sm">No profiles found</h4>
             <p className="text-xs text-slate-400 leading-relaxed mt-1">
               No doctors matched your search criteria. Try modifying your filters or search query.
             </p>
@@ -350,23 +350,23 @@ export const DoctorsPage: React.FC = () => {
           {doctors.map((doctor) => (
             <div
               key={doctor.id}
-              className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between"
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between"
             >
               <div className="space-y-4">
                 
                 {/* Header (Initials Badge + Name/Specialization) */}
                 <div className="flex items-start space-x-3">
-                  <div className="h-12 w-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-sm border border-emerald-100 shadow-inner">
+                  <div className="h-12 w-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-black text-sm border border-emerald-100 dark:border-emerald-900/35 shadow-inner">
                     Dr
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-slate-800 text-base truncate leading-snug">{doctor.full_name}</h3>
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base truncate leading-snug">{doctor.full_name}</h3>
                     <p className="text-xs text-emerald-600 font-bold tracking-wide uppercase mt-0.5">{doctor.specialization}</p>
                   </div>
                 </div>
 
                 {/* Qualification & Experience */}
-                <div className="space-y-2 border-t border-b border-slate-50 py-3.5 text-xs text-slate-500 font-medium">
+                <div className="space-y-2 border-t border-b border-slate-50 dark:border-slate-800 py-3.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
                   {doctor.qualification && (
                     <div className="flex items-center space-x-2">
                       <GraduationCap size={15} className="text-slate-400 flex-shrink-0" />
@@ -380,7 +380,7 @@ export const DoctorsPage: React.FC = () => {
                     </div>
                   )}
                   {doctor.consultation_fee && (
-                    <div className="flex items-center space-x-2 font-semibold text-slate-700">
+                    <div className="flex items-center space-x-2 font-semibold text-slate-700 dark:text-slate-300">
                       <DollarSign size={15} className="text-slate-400 flex-shrink-0" />
                       <span>Fee: {doctor.consultation_fee} INR</span>
                     </div>
@@ -394,28 +394,28 @@ export const DoctorsPage: React.FC = () => {
 
                 {/* Availability info */}
                 {doctor.available_days && (
-                  <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col space-y-1 text-xs">
+                  <div className="bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800/80 rounded-xl p-3 flex flex-col space-y-1 text-xs">
                     <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Consultation Days</span>
-                    <span className="font-bold text-slate-700 truncate">{doctor.available_days}</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300 truncate">{doctor.available_days}</span>
                   </div>
                 )}
 
               </div>
 
               {/* Action Buttons (Footer of Card) */}
-              <div className="mt-6 pt-4 border-t border-slate-50 flex items-center gap-2 justify-end">
+              <div className="mt-6 pt-4 border-t border-slate-50 dark:border-slate-800/80 flex items-center gap-2 justify-end">
                 {isAdmin ? (
                   <>
                     <button
                       onClick={() => openEditModal(doctor)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-slate-50 border border-slate-100 transition-colors"
+                      className="p-2 rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800 transition-colors"
                       title="Edit doctor profile"
                     >
                       <Edit2 size={14} />
                     </button>
                     <button
                       onClick={() => setDeletingDoctorId(doctor.id)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 border border-slate-100 transition-colors"
+                      className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 border border-slate-100 dark:border-slate-800 transition-colors"
                       title="Remove doctor profile"
                     >
                       <Trash2 size={14} />

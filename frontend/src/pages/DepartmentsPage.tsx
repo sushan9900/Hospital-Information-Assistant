@@ -232,11 +232,10 @@ export const DepartmentsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      
-      {/* PAGE HEADER */}
+            {/* PAGE HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Hospital Departments</h1>
+          <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Hospital Departments</h1>
           <p className="text-sm font-semibold text-slate-400 mt-1">
             Browse hospital wards, investigate specializations, and view staff practitioner lists.
           </p>
@@ -255,7 +254,7 @@ export const DepartmentsPage: React.FC = () => {
       </div>
 
       {/* FILTER SEARCH BAR */}
-      <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm">
+      <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl shadow-sm transition-colors duration-200">
         <div className="flex space-x-2 max-w-md">
           <SearchBar
             value={searchQuery}
@@ -276,10 +275,10 @@ export const DepartmentsPage: React.FC = () => {
       {isLoading ? (
         <LoadingSpinner message="Searching hospital units..." />
       ) : departments.length === 0 ? (
-        <div className="text-center py-20 bg-white border border-slate-100 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-4">
-          <div className="p-4 bg-slate-50 text-slate-400 rounded-full"><Building2 size={36} /></div>
+        <div className="text-center py-20 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-4">
+          <div className="p-4 bg-slate-50 dark:bg-slate-800 text-slate-400 rounded-full"><Building2 size={36} /></div>
           <div className="max-w-xs">
-            <h4 className="font-bold text-slate-700 text-sm">No departments found</h4>
+            <h4 className="font-bold text-slate-700 dark:text-slate-205 text-sm">No departments found</h4>
             <p className="text-xs text-slate-400 leading-relaxed mt-1">
               No units matched your query search. Try modifying your name filters.
             </p>
@@ -290,17 +289,17 @@ export const DepartmentsPage: React.FC = () => {
           {departments.map((dept) => (
             <div
               key={dept.id}
-              className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between"
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between"
             >
               <div className="space-y-4">
                 
                 {/* Header (Initials + Name) */}
                 <div className="flex items-start space-x-3">
-                  <div className="h-12 w-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-sm border border-emerald-100 shadow-inner">
+                  <div className="h-12 w-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-black text-sm border border-emerald-100 dark:border-emerald-900/35 shadow-inner">
                     <Activity size={20} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-slate-800 text-base truncate leading-snug">{dept.name}</h3>
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base truncate leading-snug">{dept.name}</h3>
                     <div className="flex items-center text-xs text-slate-400 font-semibold mt-1">
                       <Award size={13} className="mr-1 text-slate-400" />
                       <span>{dept.doctor_count} Registered Doctors</span>
@@ -314,7 +313,7 @@ export const DepartmentsPage: React.FC = () => {
                 </p>
 
                 {/* Location and Phone Contact Details */}
-                <div className="space-y-2 border-t border-slate-50 pt-3.5 text-xs text-slate-500 font-medium">
+                <div className="space-y-2 border-t border-slate-50 dark:border-slate-800/80 pt-3.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
                   {dept.location && (
                     <div className="flex items-center space-x-2">
                       <MapPin size={15} className="text-slate-400 flex-shrink-0" />
@@ -332,13 +331,13 @@ export const DepartmentsPage: React.FC = () => {
               </div>
 
               {/* Action Buttons (Footer of Card) */}
-              <div className="mt-6 pt-4 border-t border-slate-50 flex items-center gap-2 justify-between">
+              <div className="mt-6 pt-4 border-t border-slate-50 dark:border-slate-800/80 flex items-center gap-2 justify-between">
                 
                 {/* View details (loads nested doctors) */}
                 <button
                   onClick={() => handleViewDetail(dept.id)}
                   disabled={isDetailLoading}
-                  className="flex items-center space-x-1 text-xs text-emerald-500 hover:text-emerald-600 font-bold transition-colors"
+                  className="flex items-center space-x-1 text-xs text-emerald-500 hover:text-emerald-600 font-bold transition-colors animate-pulse-subtle"
                 >
                   <span>View Doctors</span>
                   <ArrowRight size={14} />
@@ -348,14 +347,14 @@ export const DepartmentsPage: React.FC = () => {
                   <div className="flex items-center space-x-1.5">
                     <button
                       onClick={() => openEditModal(dept)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-slate-50 border border-slate-100 transition-colors"
+                      className="p-2 rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800 transition-colors"
                       title="Edit department details"
                     >
                       <Edit2 size={14} />
                     </button>
                     <button
                       onClick={() => setDeletingDeptId(dept.id)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-55/10 border border-slate-100 transition-colors"
+                      className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 border border-slate-100 dark:border-slate-800 transition-colors"
                       title="Remove department profile"
                     >
                       <Trash2 size={14} />
@@ -389,13 +388,13 @@ export const DepartmentsPage: React.FC = () => {
           <div className="space-y-6">
             
             {/* Description & Metadata Header */}
-            <div className="space-y-3.5 bg-slate-50 border border-slate-100 p-4.5 rounded-2xl">
+            <div className="space-y-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-100 dark:border-slate-800 p-4.5 rounded-2xl">
               <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Unit Profile Description</h4>
-              <p className="text-slate-600 text-sm leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
                 {detailDept.description || 'Specialized clinical treatments logged. Continuous emergency responses and standard protocols applied.'}
               </p>
               
-              <div className="grid grid-cols-2 gap-4 border-t border-slate-200/60 pt-4 text-xs font-semibold text-slate-500">
+              <div className="grid grid-cols-2 gap-4 border-t border-slate-200/60 dark:border-slate-800 pt-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
                 {detailDept.location && (
                   <div className="flex items-center space-x-2">
                     <MapPin size={15} className="text-slate-400" />
@@ -418,7 +417,7 @@ export const DepartmentsPage: React.FC = () => {
               </h4>
               
               {detailDept.doctors.length === 0 ? (
-                <div className="text-center py-8 border border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs font-semibold">
+                <div className="text-center py-8 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 text-xs font-semibold">
                   No practitioners currently registered inside this department.
                 </div>
               ) : (
@@ -426,16 +425,16 @@ export const DepartmentsPage: React.FC = () => {
                   {detailDept.doctors.map((doc) => (
                     <div 
                       key={doc.id}
-                      className="flex items-center justify-between border border-slate-100 bg-white p-3.5 rounded-xl text-sm"
+                      className="flex items-center justify-between border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 p-3.5 rounded-xl text-sm"
                     >
                       <div className="min-w-0 flex-1 pr-2">
-                        <span className="font-bold text-slate-800 block truncate">{doc.full_name}</span>
+                        <span className="font-bold text-slate-800 dark:text-slate-100 block truncate">{doc.full_name}</span>
                         <span className="text-xs text-slate-400 mt-0.5 block truncate font-semibold uppercase">{doc.specialization}</span>
                       </div>
                       
                       {doc.consultation_fee && (
                         <div className="text-right">
-                          <span className="text-xs font-extrabold text-slate-700 block">{doc.consultation_fee} INR</span>
+                          <span className="text-xs font-extrabold text-slate-700 dark:text-slate-300 block">{doc.consultation_fee} INR</span>
                           <span className="text-[10px] text-slate-400 mt-0.5 block font-semibold">Consultation Fee</span>
                         </div>
                       )}
@@ -446,7 +445,7 @@ export const DepartmentsPage: React.FC = () => {
             </div>
 
             {/* Dialog Footer Actions */}
-            <div className="flex justify-end pt-4 border-t border-slate-100">
+            <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setDetailDept(null)}

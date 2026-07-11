@@ -237,7 +237,7 @@ export const AppointmentsPage: React.FC = () => {
       
       {/* HEADER PAGE */}
       <div>
-        <h1 className="text-2xl font-black text-slate-800 tracking-tight">Appointments Portal</h1>
+        <h1 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Appointments Portal</h1>
         <p className="text-sm font-semibold text-slate-400 mt-1">
           {isAdmin 
             ? 'Oversee all hospital appointments, verify schedules, and update status logs.'
@@ -246,8 +246,8 @@ export const AppointmentsPage: React.FC = () => {
       </div>
 
       {/* SEARCH FILTERS BLOCK */}
-      <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm space-y-4">
-        <div className="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-50">
+      <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl shadow-sm space-y-4 transition-colors duration-200">
+        <div className="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-50 dark:border-slate-800">
           <span className="flex items-center"><Filter size={14} className="mr-1.5" /> Filter Log Results</span>
         </div>
 
@@ -262,7 +262,7 @@ export const AppointmentsPage: React.FC = () => {
                 setSelectedStatus(e.target.value ? e.target.value as AppointmentStatus : undefined);
                 setCurrentPage(1);
               }}
-              className="w-full bg-slate-50 border border-slate-200 text-sm text-slate-700 py-2.5 px-3 rounded-xl outline-none hover:border-slate-300 focus:border-emerald-500 shadow-inner"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-300 py-2.5 px-3 rounded-xl outline-none hover:border-slate-300 dark:hover:border-slate-700 focus:border-emerald-500 shadow-inner"
             >
               <option value="">All Statuses</option>
               <option value={AppointmentStatus.PENDING}>Pending</option>
@@ -282,7 +282,7 @@ export const AppointmentsPage: React.FC = () => {
                   setSelectedDoctorId(e.target.value ? Number(e.target.value) : undefined);
                   setCurrentPage(1);
                 }}
-                className="w-full bg-slate-50 border border-slate-200 text-sm text-slate-700 py-2.5 px-3 rounded-xl outline-none hover:border-slate-300 focus:border-emerald-500 shadow-inner"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-300 py-2.5 px-3 rounded-xl outline-none hover:border-slate-300 dark:hover:border-slate-700 focus:border-emerald-500 shadow-inner"
               >
                 <option value="">All Doctors</option>
                 {doctors.map((d) => (
@@ -306,7 +306,7 @@ export const AppointmentsPage: React.FC = () => {
                   value={filterUserId}
                   onChange={(e) => setFilterUserId(e.target.value)}
                   placeholder="e.g. 5"
-                  className="w-full bg-slate-50 border border-slate-200 text-sm text-slate-700 py-2 px-3 rounded-xl outline-none hover:border-slate-300 focus:border-emerald-500 shadow-inner"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm text-slate-700 dark:text-slate-300 py-2 px-3 rounded-xl outline-none hover:border-slate-300 dark:hover:border-slate-700 focus:border-emerald-500 shadow-inner"
                 />
                 <button
                   type="submit"
@@ -327,21 +327,21 @@ export const AppointmentsPage: React.FC = () => {
       {isLoading ? (
         <LoadingSpinner message="Querying scheduled appointments..." />
       ) : appointments.length === 0 ? (
-        <div className="text-center py-20 bg-white border border-slate-100 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-4">
-          <div className="p-4 bg-slate-50 text-slate-400 rounded-full"><ClipboardList size={36} /></div>
+        <div className="text-center py-20 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-4">
+          <div className="p-4 bg-slate-50 dark:bg-slate-800 text-slate-400 rounded-full"><ClipboardList size={36} /></div>
           <div className="max-w-xs">
-            <h4 className="font-bold text-slate-700 text-sm">No bookings found</h4>
+            <h4 className="font-bold text-slate-700 dark:text-slate-200 text-sm">No bookings found</h4>
             <p className="text-xs text-slate-400 leading-relaxed mt-1">
               No medical visits matched your status filters or search queries.
             </p>
           </div>
         </div>
       ) : (
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
-                <tr className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <tr className="bg-slate-50 dark:bg-slate-950/60 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   <th className="px-6 py-3.5">ID</th>
                   <th className="px-6 py-3.5">Date & Time</th>
                   <th className="px-6 py-3.5">{isAdmin ? 'Patient profile' : 'Doctor Specialist'}</th>
@@ -350,9 +350,9 @@ export const AppointmentsPage: React.FC = () => {
                   <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
                 {appointments.map((appt) => (
-                  <tr key={appt.id} className="hover:bg-slate-50/20 transition-colors">
+                  <tr key={appt.id} className="hover:bg-slate-50/20 dark:hover:bg-slate-800/20 transition-colors">
                     
                     {/* Booking ID */}
                     <td className="px-6 py-4 font-bold text-slate-400">
@@ -362,9 +362,9 @@ export const AppointmentsPage: React.FC = () => {
                     {/* Date and Time */}
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-2.5">
-                        <div className="p-2 bg-slate-100 text-slate-500 rounded-lg"><Calendar size={16} /></div>
+                        <div className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg"><Calendar size={16} /></div>
                         <div className="flex flex-col">
-                          <span className="font-bold text-slate-800">{appt.appointment_date}</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-100">{appt.appointment_date}</span>
                           <span className="text-[11px] text-slate-400 flex items-center mt-0.5 font-semibold">
                             <Clock size={12} className="mr-1" />
                             {appt.appointment_time}
@@ -378,12 +378,12 @@ export const AppointmentsPage: React.FC = () => {
                       <div className="flex flex-col">
                         {isAdmin ? (
                           <>
-                            <span className="font-bold text-slate-800">{appt.user?.full_name}</span>
+                            <span className="font-bold text-slate-800 dark:text-slate-100">{appt.user?.full_name}</span>
                             <span className="text-[11px] text-slate-400 mt-0.5 font-semibold">ID: {appt.user_id}</span>
                           </>
                         ) : (
                           <>
-                            <span className="font-bold text-slate-800">{appt.doctor?.full_name}</span>
+                            <span className="font-bold text-slate-800 dark:text-slate-100">{appt.doctor?.full_name}</span>
                             <span className="text-[11px] text-slate-400 mt-0.5 font-semibold">{appt.doctor?.specialization}</span>
                           </>
                         )}
@@ -392,8 +392,8 @@ export const AppointmentsPage: React.FC = () => {
 
                     {/* Reason */}
                     <td className="px-6 py-4 max-w-xs">
-                      <p className="truncate font-medium text-slate-600" title={appt.reason || ''}>
-                        {appt.reason || <span className="text-slate-300 italic">No reason provided</span>}
+                      <p className="truncate font-medium text-slate-600 dark:text-slate-400" title={appt.reason || ''}>
+                        {appt.reason || <span className="text-slate-300 dark:text-slate-600 italic">No reason provided</span>}
                       </p>
                     </td>
 
@@ -444,21 +444,21 @@ export const AppointmentsPage: React.FC = () => {
                           <div className="flex items-center justify-end space-x-2">
                             <button
                               onClick={() => openRescheduleModal(appt)}
-                              className="inline-flex items-center space-x-1 border border-slate-100 hover:bg-slate-50 text-slate-600 py-1.5 px-3 rounded-xl text-xs font-bold transition-all"
+                              className="inline-flex items-center space-x-1 border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 py-1.5 px-3 rounded-xl text-xs font-bold transition-all"
                             >
                               <RefreshCw size={13} />
                               <span>Reschedule</span>
                             </button>
                             <button
                               onClick={() => setCancellingApptId(appt.id)}
-                              className="inline-flex items-center space-x-1 border border-red-50 hover:bg-red-500 hover:text-white text-red-500 py-1.5 px-3 rounded-xl text-xs font-bold transition-all"
+                              className="inline-flex items-center space-x-1 border border-red-50 dark:border-red-900/30 hover:bg-red-500 hover:text-white text-red-500 py-1.5 px-3 rounded-xl text-xs font-bold transition-all"
                             >
                               <XCircle size={13} />
                               <span>Cancel</span>
                             </button>
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-300 italic">No actions</span>
+                          <span className="text-xs text-slate-300 dark:text-slate-600 italic">No actions</span>
                         )
                       )}
                     </td>

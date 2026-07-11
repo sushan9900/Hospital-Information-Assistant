@@ -407,7 +407,7 @@ class RAGService:
         llm = ChatGroq(
             api_key=settings.GROQ_API_KEY,
             model=settings.GROQ_MODEL,
-            temperature=0.3,   # Lower temperature = more factual answers
+            temperature=0.0,   # 0.0 = completely factual, no creative hallucination
             max_tokens=1024
         )
 
@@ -525,3 +525,133 @@ class RAGService:
                 data_type="all"      # Re-embed everything
             )
         )
+
+    # --------------------------------------------------------------------------
+    # INDIVIDUAL SYNC HOOKS (AUTOMATIC REAL-TIME SYNC)
+    # --------------------------------------------------------------------------
+    @classmethod
+    async def sync_doctor(cls, db: AsyncSession, doctor_id: int) -> bool:
+        """
+        Embeds a single doctor into Qdrant.
+        """
+        from sqlalchemy.orm import selectinload
+        result = await db.execute(
+            select(Doctor)
+            .where(Doctor.id == doctor_id)
+            .options(selectinload(Doctor.department))
+        )
+        doctor = result.scalar_one_or_none()
+        if not doctor:
+            return False
+
+        content_parts = [
+            f"Doctor: {doctor.full_name}",
+            f"Specialization: {doctor.specialization}",
+        ]
+        if doctor.qualification:
+            content_parts.append(f"Qualification: {doctor.qualification}")
+        if doctor.experience_years:
+            content_parts.append(f"Experience: {doctor.experience_years} years")
+        if doctor.bio:
+            content_parts.append(f"About: {doctor.bio}")
+        if doctor.available_days:
+            content_parts.append(f"Available: {doctor.available_days}")
+        if doctor.consultation_fee:
+            content_parts.append(f"Fee: {doctor.consultation_fee}")
+        if doctor.department:
+            content_parts.append(f"Department: {doctor.department.name}")
+
+        content = " | ".join(content_parts)
+        vector = await asyncio.to_thread(embed_text, content)
+
+        point = {
+            "id": f"doctor_{doctor.id}",
+            "vector": vector,
+            "payload": {
+                "type": "doctor",
+                "record_id": doctor.id,
+                "content": content,
+                "name": doctor.full_name,
+                "specialization": doctor.specialization,
+                "department": doctor.department.name if doctor.department else None,
+                "experience_years": doctor.experience_years,
+                "available_days": doctor.available_days,
+                "consultation_fee": doctor.consultation_fee,
+                "phone": doctor.phone,
+                "email": doctor.email,
+            }
+        }
+        await asyncio.to_thread(
+            QdrantService.upsert_points,
+            settings.QDRANT_COLLECTION_NAME,
+            [point]
+        )
+        return True
+
+    @classmethod
+    async def sync_department(cls, db: AsyncSession, dept_id: int) -> bool:
+        """
+        Embeds a single department into Qdrant.
+        """
+        result = await db.execute(
+            select(Department).where(Department.id == dept_id)
+        )
+        dept = result.scalar_one_or_none()
+        if not dept:
+            return False
+
+        content_parts = [f"Department: {dept.name}"]
+        if dept.description:
+            content_parts.append(f"About: {dept.description}")
+        if dept.location:
+            content_parts.append(f"Location: {dept.location}")
+        if dept.phone:
+            content_parts.append(f"Phone: {dept.phone}")
+
+        content = " | ".join(content_parts)
+        vector = await asyncio.to_thread(embed_text, content)
+
+        point = {
+            "id": f"department_{dept.id}",
+            "vector": vector,
+            "payload": {
+                "type": "department",
+                "record_id": dept.id,
+                "content": content,
+                "name": dept.name,
+                "description": dept.description,
+                "location": dept.location,
+                "phone": dept.phone,
+            }
+        }
+        await asyncio.to_thread(
+            QdrantService.upsert_points,
+            settings.QDRANT_COLLECTION_NAME,
+            [point]
+        )
+        return True
+
+    @staticmethod
+    async def delete_doctor_embedding(doctor_id: int) -> bool:
+        """
+        Deletes a doctor's vector embedding from Qdrant.
+        """
+        await asyncio.to_thread(
+            QdrantService.delete_point,
+            collection_name=settings.QDRANT_COLLECTION_NAME,
+            point_id=f"doctor_{doctor_id}"
+        )
+        return True
+
+    @staticmethod
+    async def delete_department_embedding(dept_id: int) -> bool:
+        """
+        Deletes a department's vector embedding from Qdrant.
+        """
+        await asyncio.to_thread(
+            QdrantService.delete_point,
+            collection_name=settings.QDRANT_COLLECTION_NAME,
+            point_id=f"department_{dept_id}"
+        )
+        return True
+

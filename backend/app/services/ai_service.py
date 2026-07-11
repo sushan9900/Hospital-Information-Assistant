@@ -91,28 +91,32 @@ def get_session_history(session_id: str) -> ChatMessageHistory:
 #      its role, and what it should and shouldn't do.
 # WHAT: Defines the AI as a Hospital Information Assistant.
 # ==============================================================================
-HOSPITAL_SYSTEM_PROMPT = """You are a helpful and professional AI assistant for the Hospital Information Assistance system.
+HOSPITAL_SYSTEM_PROMPT = """You are a helpful, professional, and friendly AI assistant for the Hospital Information Assistance system.
 
-Your role is to:
-- Answer questions about the hospital, its departments, doctors, and services
-- Help patients understand appointment procedures and hospital policies
-- Provide general health information and guidance (not medical diagnoses)
-- Assist with navigating hospital services and finding the right department
+Your role is to help users find information about the hospital, its departments, doctors, services, and appointment scheduling.
 
-Guidelines:
-- Always be polite, empathetic, and professional in your responses
-- If you don't have specific information, politely say so and suggest contacting the hospital directly
-- Do NOT provide specific medical diagnoses or prescribe medications
-- Do NOT share any private patient information
-- Keep responses clear, concise, and easy to understand
-- Use the conversation history to maintain context and avoid repeating yourself
+Strict Guidelines:
+1. GREETINGS & INTRODUCTIONS: You are allowed to respond to greetings (e.g., "Hello", "Hi", "Good morning", "Hey"), thank the user, and engage in polite conversational filler or introduce your capabilities as the Hospital Information Assistant. You should invite them to ask about hospital departments, doctors, appointment scheduling, and services.
+2. FACTUAL QUESTIONS: For any factual questions about the hospital, its departments, doctors, fees, schedules, appointments, or services, you MUST rely ONLY on the provided context below. Do NOT use external pre-trained knowledge, and do NOT assume or invent any details not explicitly mentioned in the context.
+3. INSUFFICIENT INFORMATION: If a factual question about the hospital, a doctor, a department, or an appointment cannot be answered using the provided context, you must state:
+   "I don't have enough information about that in our hospital records. Please contact the hospital directly for more details."
+4. NO MEDICAL ADVICE: Do NOT provide medical diagnoses, treatment advice, or prescribe medications under any circumstances. If the user asks about medical symptoms, personal advice, or health guidelines, politely refuse and state that you can only assist with hospital administration, schedules, departments, and doctors.
+5. CONVERSATION HISTORY: Use the conversation history to maintain context for follow-up questions, especially when discussing records.
+6. FORMATTING: Present your answers in a professional, structured manner using Markdown formatting (such as bullet points, bold text, headers, and simple tables where appropriate) to make them readable and easy to follow.
 
-If asked about something outside your scope (like personal advice, non-medical topics), 
-politely redirect the conversation back to hospital-related topics.
+Context interpretation:
+- The context may include TWO sections:
+  a) "Semantic Search Results" — text descriptions of doctor/department records.
+  b) "Live Database Query Results" — raw JSON rows fetched directly from the database in real-time.
+- When the Live Database Query Results contain a JSON array with a "count" field (e.g. [{{"count": 5}}]),
+  interpret it as the exact number of matching records and state that number in your answer.
+- When the Live Database Query Results contain rows of doctor or department data, summarize them clearly.
+- The Live Database Query Results are always the most up-to-date and accurate data — prefer them over Semantic Search Results when both are present.
 
-Relevant context from the hospital database (use this to help answer the user's query if relevant):
+Relevant context from the hospital database:
 {context}
 """
+
 
 
 # ==============================================================================
@@ -142,7 +146,7 @@ class AIService:
             cls._llm = ChatGroq(
                 api_key=settings.GROQ_API_KEY,
                 model=settings.GROQ_MODEL,
-                temperature=0.7,        # 0=deterministic, 1=creative. 0.7 is balanced
+                temperature=0.0,        # 0.0 is completely deterministic and strictly follows prompt instructions
                 max_tokens=1024,        # Max tokens in AI response
             )
         return cls._llm
@@ -261,9 +265,30 @@ class AIService:
                         f"Content: {payload.get('content', 'No content available')}\n"
                     )
                 context_str = "\n".join(context_parts)
-        except Exception:
+        except Exception as e:
             # If Qdrant is not set up or search fails, fall back to default
+            import logging
+            logging.getLogger(__name__).error(f"QDRANT SEARCH ERROR: {str(e)}", exc_info=True)
             pass
+
+        # Step 3.5: Live database context — run a real-time SQL SELECT query
+        # grounded on the user's question to supplement semantic search results.
+        # Fails silently so chat is never blocked by DB errors.
+        from app.services.db_context_service import get_db_context
+        live_db_context = ""
+        try:
+            live_db_context = await get_db_context(user_query=chat_request.message, db=db)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"LIVE DB CONTEXT ERROR: {str(e)}", exc_info=True)
+
+        # Combine: Qdrant semantic results + live SQL query results
+        combined_parts = []
+        if context_str and context_str != "No relevant context found.":
+            combined_parts.append("--- Semantic Search Results ---\n" + context_str)
+        if live_db_context and not live_db_context.startswith("Database query context failed"):
+            combined_parts.append("--- Live Database Query Results ---\n" + live_db_context)
+        combined_context_str = "\n\n".join(combined_parts) if combined_parts else "No relevant context found."
 
         try:
             # Step 4: Invoke the LangChain chain with memory
@@ -275,7 +300,7 @@ class AIService:
             chain = AIService._get_chain()
 
             response = await chain.ainvoke(
-                {"input": chat_request.message, "context": context_str},
+                {"input": chat_request.message, "context": combined_context_str},
                 config={"configurable": {"session_id": chat_request.session_id}}
             )
 

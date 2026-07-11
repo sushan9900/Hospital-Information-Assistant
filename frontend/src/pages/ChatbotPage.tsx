@@ -16,6 +16,8 @@
 // ==============================================================================
 
 import React, { useEffect, useState, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Sidebar } from '@/components/Sidebar';
 import { chatService } from '@/services/chatService';
 import { ChatMessage, ChatSession } from '@/types';
@@ -228,7 +230,36 @@ export const ChatbotPage: React.FC = () => {
                               ? 'bg-clinic-forest-500 text-white rounded-tr-none'
                               : 'bg-white dark:bg-slate-900 text-clinic-text dark:text-slate-200 border border-clinic-sage-200/40 dark:border-slate-850 rounded-tl-none font-medium'
                           }`}>
-                            <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                            {isHuman ? (
+                              <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                            ) : (
+                              <div className="prose prose-sm dark:prose-invert max-w-none text-clinic-text dark:text-slate-200">
+                                <ReactMarkdown
+                                  remarkPlugins={[remarkGfm]}
+                                  components={{
+                                    h1: ({ node, ...props }) => <h1 className="text-sm font-serif font-bold text-clinic-forest-600 dark:text-clinic-forest-400 mt-2 mb-1" {...props} />,
+                                    h2: ({ node, ...props }) => <h2 className="text-xs font-serif font-semibold text-clinic-forest-600 dark:text-clinic-forest-400 mt-1.5 mb-1" {...props} />,
+                                    p: ({ node, ...props }) => <p className="mb-1.5 last:mb-0 leading-relaxed font-medium" {...props} />,
+                                    ul: ({ node, ...props }) => <ul className="list-disc pl-4 mb-2 mt-1 space-y-0.5" {...props} />,
+                                    ol: ({ node, ...props }) => <ol className="list-decimal pl-4 mb-2 mt-1 space-y-0.5" {...props} />,
+                                    li: ({ node, ...props }) => <li className="text-sm font-medium" {...props} />,
+                                    strong: ({ node, ...props }) => <strong className="font-bold text-clinic-forest-600 dark:text-clinic-forest-400" {...props} />,
+                                    table: ({ node, ...props }) => (
+                                      <div className="overflow-x-auto my-2 rounded-lg border border-clinic-sage-200/30 dark:border-slate-800 shadow-sm">
+                                        <table className="min-w-full divide-y divide-clinic-sage-200/30 dark:divide-slate-800 text-xs text-left" {...props} />
+                                      </div>
+                                    ),
+                                    thead: ({ node, ...props }) => <thead className="bg-clinic-sage-50/50 dark:bg-slate-900 font-bold text-clinic-text dark:text-slate-200" {...props} />,
+                                    tbody: ({ node, ...props }) => <tbody className="divide-y divide-clinic-sage-200/10 dark:divide-slate-800/50" {...props} />,
+                                    tr: ({ node, ...props }) => <tr className="hover:bg-clinic-sage-50/10 dark:hover:bg-slate-900/10" {...props} />,
+                                    th: ({ node, ...props }) => <th className="px-2.5 py-1.5 font-bold border-b border-clinic-sage-200/20 dark:border-slate-800" {...props} />,
+                                    td: ({ node, ...props }) => <td className="px-2.5 py-1.5 border-b border-clinic-sage-200/10 dark:border-slate-800/30 font-medium" {...props} />,
+                                  }}
+                                >
+                                  {msg.content}
+                                </ReactMarkdown>
+                              </div>
+                            )}
                           </div>
                           <span className={`text-[9px] text-clinic-text/40 dark:text-slate-500 ${isHuman ? 'text-right pr-1' : 'pl-1'}`}>
                             Just now

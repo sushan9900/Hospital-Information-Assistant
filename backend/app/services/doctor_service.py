@@ -118,6 +118,13 @@ class DoctorService:
         await db.flush()
         await db.refresh(new_doctor)
 
+        # Sync to Qdrant vector database (fail silently to avoid blocking DB transaction)
+        from app.services.rag_service import RAGService
+        try:
+            await RAGService.sync_doctor(db=db, doctor_id=new_doctor.id)
+        except Exception:
+            pass
+
         # Step 5: Return response with nested department info
         return DoctorResponse(
             **{k: v for k, v in new_doctor.__dict__.items() if not k.startswith("_") and k != "department"},
@@ -367,6 +374,13 @@ class DoctorService:
         await db.flush()
         await db.refresh(doctor)
 
+        # Sync to Qdrant vector database (fail silently to avoid blocking DB transaction)
+        from app.services.rag_service import RAGService
+        try:
+            await RAGService.sync_doctor(db=db, doctor_id=doctor.id)
+        except Exception:
+            pass
+
         # Reload department for response (in case it changed)
         dept_result = await db.execute(
             select(Department).where(Department.id == doctor.department_id)
@@ -423,6 +437,14 @@ class DoctorService:
             )
 
         doctor_name = doctor.full_name
+        
+        # Sync deletion to Qdrant vector database (fail silently to avoid blocking DB transaction)
+        from app.services.rag_service import RAGService
+        try:
+            await RAGService.delete_doctor_embedding(doctor_id=doctor.id)
+        except Exception:
+            pass
+
         await db.delete(doctor)
         await db.flush()
 

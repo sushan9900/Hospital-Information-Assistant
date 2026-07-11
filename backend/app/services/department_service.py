@@ -94,6 +94,13 @@ class DepartmentService:
         await db.flush()
         await db.refresh(new_dept)
 
+        # Sync to Qdrant vector database (fail silently to avoid blocking DB transaction)
+        from app.services.rag_service import RAGService
+        try:
+            await RAGService.sync_department(db=db, dept_id=new_dept.id)
+        except Exception:
+            pass
+
         # Step 4: Return response (new dept has 0 doctors)
         return DepartmentResponse(
             **new_dept.__dict__,
@@ -293,6 +300,7 @@ class DepartmentService:
             )
 
         # If changing the name, check it's not taken by another department
+        name_changed = False
         if dept_data.name is not None and dept_data.name != dept.name:
             name_check = await db.execute(
                 select(Department).where(
@@ -306,6 +314,7 @@ class DepartmentService:
                     detail=f"A department named '{dept_data.name}' already exists."
                 )
             dept.name = dept_data.name
+            name_changed = True
 
         # Apply other optional updates
         if dept_data.description is not None:
@@ -318,6 +327,22 @@ class DepartmentService:
         # Save changes
         await db.flush()
         await db.refresh(dept)
+
+        # Sync to Qdrant vector database (fail silently to avoid blocking DB transaction)
+        from app.services.rag_service import RAGService
+        try:
+            await RAGService.sync_department(db=db, dept_id=dept.id)
+            if name_changed:
+                # If department name changed, we must re-embed all doctors in this department
+                # because their doctor embeddings include the department name.
+                doctors_result = await db.execute(
+                    select(Doctor).where(Doctor.department_id == dept.id)
+                )
+                doctors = doctors_result.scalars().all()
+                for doc in doctors:
+                    await RAGService.sync_doctor(db=db, doctor_id=doc.id)
+        except Exception:
+            pass
 
         # Get fresh doctor count for the response
         doc_count_result = await db.execute(
@@ -375,6 +400,21 @@ class DepartmentService:
             )
 
         dept_name = dept.name
+
+        # Sync deletion to Qdrant vector database (fail silently to avoid blocking DB transaction)
+        from app.services.rag_service import RAGService
+        try:
+            # 1. Delete doctor embeddings under this department (cascade equivalent)
+            doctors_result = await db.execute(
+                select(Doctor.id).where(Doctor.department_id == dept_id)
+            )
+            doc_ids = doctors_result.scalars().all()
+            for doc_id in doc_ids:
+                await RAGService.delete_doctor_embedding(doctor_id=doc_id)
+            # 2. Delete department embedding
+            await RAGService.delete_department_embedding(dept_id=dept_id)
+        except Exception:
+            pass
 
         # Delete the department — CASCADE will remove associated doctors
         await db.delete(dept)
