@@ -1,20 +1,3 @@
-# ==============================================================================
-# Hospital Information Assistance — RAG Router
-# ==============================================================================
-# WHY THIS FILE EXISTS:
-#   Defines all HTTP endpoints for the Retrieval Augmented Generation (RAG) system.
-#   It handles vector search queries, document embedding, and Q&A grounding
-#   using our Qdrant vector database and Groq LLM.
-#
-# ENDPOINTS:
-#   POST   /rag/embed      → Seed/update Qdrant vector database (admin only)
-#   POST   /rag/search     → Perform semantic vector search (public)
-#   POST   /rag/ask        → Ask a question using the RAG pipeline (public)
-#   DELETE /rag/delete     → Delete a specific embedding point (admin only)
-#   DELETE /rag/delete-all → Clear all points from the collection (admin only)
-#   POST   /rag/rebuild    → Rebuild all database embeddings from scratch (admin only)
-# ==============================================================================
-
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -37,12 +20,6 @@ from app.services.rag_service import RAGService
 router = APIRouter()
 
 
-# ==============================================================================
-# EMBED ALL DATA (ADMIN ONLY)
-# Method: POST
-# Path:   /rag/embed
-# Access: Admin only
-# ==============================================================================
 @router.post(
     "/embed",
     response_model=RAGEmbedResponse,
@@ -75,13 +52,6 @@ async def embed_all_data(
     """
     return await RAGService.embed_all(db=db, embed_request=embed_request)
 
-
-# ==============================================================================
-# SEMANTIC SEARCH
-# Method: POST
-# Path:   /rag/search
-# Access: Public
-# ==============================================================================
 @router.post(
     "/search",
     response_model=RAGSearchResponse,
@@ -109,13 +79,6 @@ async def semantic_search(
     """
     return await RAGService.semantic_search(search_request=search_request)
 
-
-# ==============================================================================
-# RAG ASK (Q&A PIPELINE)
-# Method: POST
-# Path:   /rag/ask
-# Access: Public
-# ==============================================================================
 @router.post(
     "/ask",
     response_model=RAGAskResponse,
@@ -145,13 +108,6 @@ async def rag_ask(
     """
     return await RAGService.rag_ask(ask_request=ask_request)
 
-
-# ==============================================================================
-# DELETE SINGLE EMBEDDING (ADMIN ONLY)
-# Method: DELETE
-# Path:   /rag/delete
-# Access: Admin only
-# ==============================================================================
 @router.delete(
     "/delete",
     response_model=RAGOperationResponse,
@@ -174,12 +130,6 @@ async def delete_embedding(
     return await RAGService.delete_embedding(delete_request=delete_request)
 
 
-# ==============================================================================
-# DELETE ALL EMBEDDINGS (ADMIN ONLY)
-# Method: DELETE
-# Path:   /rag/delete-all
-# Access: Admin only
-# ==============================================================================
 @router.delete(
     "/delete-all",
     response_model=RAGOperationResponse,
@@ -197,13 +147,6 @@ async def delete_all_embeddings(
     """
     return await RAGService.delete_all_embeddings()
 
-
-# ==============================================================================
-# REBUILD ALL EMBEDDINGS (ADMIN ONLY)
-# Method: POST
-# Path:   /rag/rebuild
-# Access: Admin only
-# ==============================================================================
 @router.post(
     "/rebuild",
     response_model=RAGEmbedResponse,

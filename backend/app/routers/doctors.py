@@ -1,19 +1,3 @@
-# ==============================================================================
-# Hospital Information Assistance — Doctors Router
-# ==============================================================================
-# WHY THIS FILE EXISTS:
-#   Defines all HTTP endpoints for doctor management.
-#   Doctors are PUBLIC data — anyone can browse doctor profiles.
-#   Creating, updating, and deleting doctors is restricted to admins.
-#
-# ENDPOINTS:
-#   GET    /doctors              → List all doctors with filters (public)
-#   POST   /doctors              → Add a new doctor (admin only)
-#   GET    /doctors/{doctor_id}  → Get a single doctor's profile (public)
-#   PUT    /doctors/{doctor_id}  → Update a doctor (admin only)
-#   DELETE /doctors/{doctor_id}  → Delete a doctor (admin only)
-# ==============================================================================
-
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
@@ -34,12 +18,6 @@ from app.services.doctor_service import DoctorService
 router = APIRouter()
 
 
-# ==============================================================================
-# LIST ALL DOCTORS
-# Method: GET
-# Path:   /doctors
-# Access: PUBLIC (no authentication required)
-# ==============================================================================
 @router.get(
     "/",
     response_model=DoctorListResponse,
@@ -99,13 +77,6 @@ async def list_doctors(
         search=search
     )
 
-
-# ==============================================================================
-# CREATE DOCTOR (ADMIN ONLY)
-# Method: POST
-# Path:   /doctors
-# Access: Admin only
-# ==============================================================================
 @router.post(
     "/",
     response_model=DoctorResponse,
@@ -153,12 +124,6 @@ async def create_doctor(
     return await DoctorService.create_doctor(db=db, doctor_data=doctor_data)
 
 
-# ==============================================================================
-# GET DOCTOR BY ID
-# Method: GET
-# Path:   /doctors/{doctor_id}
-# Access: PUBLIC (no authentication required)
-# ==============================================================================
 @router.get(
     "/{doctor_id}",
     response_model=DoctorResponse,
@@ -187,13 +152,6 @@ async def get_doctor(
     """
     return await DoctorService.get_doctor_by_id(db=db, doctor_id=doctor_id)
 
-
-# ==============================================================================
-# UPDATE DOCTOR (ADMIN ONLY)
-# Method: PUT
-# Path:   /doctors/{doctor_id}
-# Access: Admin only
-# ==============================================================================
 @router.put(
     "/{doctor_id}",
     response_model=DoctorResponse,
@@ -238,12 +196,6 @@ async def update_doctor(
     )
 
 
-# ==============================================================================
-# DELETE DOCTOR (ADMIN ONLY)
-# Method: DELETE
-# Path:   /doctors/{doctor_id}
-# Access: Admin only
-# ==============================================================================
 @router.delete(
     "/{doctor_id}",
     status_code=status.HTTP_200_OK,

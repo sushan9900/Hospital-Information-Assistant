@@ -1,25 +1,3 @@
-# ==============================================================================
-# Hospital Information Assistance — Appointments Router
-# ==============================================================================
-# WHY THIS FILE EXISTS:
-#   Defines all HTTP endpoints for appointment booking and management.
-#   Appointments require authentication — patients must be logged in to book.
-#
-# ENDPOINTS:
-#   POST   /appointments                          → Book a new appointment (patient)
-#   GET    /appointments/my                       → Patient's own appointments
-#   GET    /appointments                          → All appointments (admin only)
-#   GET    /appointments/{appt_id}                → Single appointment detail
-#   PUT    /appointments/{appt_id}                → Reschedule appointment (patient)
-#   PATCH  /appointments/{appt_id}/status         → Change status (admin only)
-#   DELETE /appointments/{appt_id}/cancel         → Cancel appointment (patient)
-#
-# NOTE ON ROUTE ORDER:
-#   FastAPI matches routes in the order they are defined.
-#   GET /appointments/my MUST be defined BEFORE GET /appointments/{appt_id}
-#   Otherwise FastAPI will try to match "my" as an integer ID and fail!
-# ==============================================================================
-
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
@@ -42,12 +20,7 @@ from app.services.appointment_service import AppointmentService
 router = APIRouter()
 
 
-# ==============================================================================
-# BOOK A NEW APPOINTMENT
-# Method: POST
-# Path:   /appointments
-# Access: Protected (any logged-in user / patient)
-# ==============================================================================
+
 @router.post(
     "/",
     response_model=AppointmentResponse,
@@ -94,14 +67,6 @@ async def book_appointment(
     )
 
 
-# ==============================================================================
-# GET MY APPOINTMENTS (PATIENT)
-# Method: GET
-# Path:   /appointments/my
-# Access: Protected (any logged-in user)
-# IMPORTANT: This route must come BEFORE /{appt_id} to prevent "my" being
-#            parsed as an integer appointment ID.
-# ==============================================================================
 @router.get(
     "/my",
     response_model=AppointmentListResponse,
@@ -146,12 +111,6 @@ async def get_my_appointments(
     )
 
 
-# ==============================================================================
-# GET ALL APPOINTMENTS (ADMIN ONLY)
-# Method: GET
-# Path:   /appointments
-# Access: Admin only
-# ==============================================================================
 @router.get(
     "/",
     response_model=AppointmentListResponse,
@@ -206,12 +165,7 @@ async def list_all_appointments(
     )
 
 
-# ==============================================================================
-# GET APPOINTMENT BY ID
-# Method: GET
-# Path:   /appointments/{appt_id}
-# Access: Protected (patient sees only own; admin sees all)
-# ==============================================================================
+
 @router.get(
     "/{appt_id}",
     response_model=AppointmentResponse,
@@ -252,12 +206,6 @@ async def get_appointment(
     )
 
 
-# ==============================================================================
-# UPDATE / RESCHEDULE APPOINTMENT (PATIENT)
-# Method: PUT
-# Path:   /appointments/{appt_id}
-# Access: Protected (appointment owner only)
-# ==============================================================================
 @router.put(
     "/{appt_id}",
     response_model=AppointmentResponse,
@@ -308,12 +256,6 @@ async def update_appointment(
     )
 
 
-# ==============================================================================
-# UPDATE APPOINTMENT STATUS (ADMIN ONLY)
-# Method: PATCH
-# Path:   /appointments/{appt_id}/status
-# Access: Admin only
-# ==============================================================================
 @router.patch(
     "/{appt_id}/status",
     response_model=AppointmentResponse,
@@ -360,12 +302,6 @@ async def update_appointment_status(
     )
 
 
-# ==============================================================================
-# CANCEL APPOINTMENT (PATIENT)
-# Method: DELETE
-# Path:   /appointments/{appt_id}/cancel
-# Access: Protected (appointment owner only)
-# ==============================================================================
 @router.delete(
     "/{appt_id}/cancel",
     status_code=status.HTTP_200_OK,
