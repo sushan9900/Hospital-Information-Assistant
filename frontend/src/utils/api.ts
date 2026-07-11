@@ -22,7 +22,7 @@ import axios from 'axios';
 
 // Get the backend API URL from the Vite environment config (.env)
 // Fall back to localhost:8000 if not specified
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 // Create a custom Axios instance
 const api = axios.create({
